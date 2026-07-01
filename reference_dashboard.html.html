@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vedasakthi | TN Govt School ERP - Minister's View</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border: #e0e6ed;
+            --blue: #3498db;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --orange: #e67e22;
+            --red: #e74c3c;
+            --teal: #1abc9c;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: var(--bg-color);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card.active {
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .card-schools::before { background-color: var(--blue); }
+        .card-attendance::before { background-color: var(--green); }
+        .card-neet::before { background-color: var(--purple); }
+        .card-blocks::before { background-color: var(--orange); }
+        .card-teachers::before { background-color: var(--teal); }
+        .card-electricity::before { background-color: #f1c40f; }
+        .card-labs::before { background-color: var(--red); }
+        .card-sanitation::before { background-color: #34495e; }
+
+        .kpi-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeeba;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=visualization"></script>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Vedasakthi | Hon. Minister's Command View</h1>
+        <div style="font-size: 14px; font-weight: 600;">System Status: <span style="color:var(--green)">LIVE</span></div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="instructions">
+                <strong>Data Mode:</strong> Select a metric to render the district heatmap.
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card card-schools active" onclick="activateHeatmap('Total Schools', this)">
+                    <div class="kpi-title">Total Schools</div>
+                    <div class="kpi-value">40,000+</div>
+                </div>
+                <div class="kpi-card card-attendance" onclick="activateHeatmap('Attendance', this)">
+                    <div class="kpi-title">Attendance</div>
+                    <div class="kpi-value">88.5%</div>
+                </div>
+                <div class="kpi-card card-neet" onclick="activateHeatmap('NEET Qualified', this)">
+                    <div class="kpi-title">NEET Qualified</div>
+                    <div class="kpi-value">14,205</div>
+                </div>
+                <div class="kpi-card card-labs" onclick="activateHeatmap('Hi-Tech Labs', this)">
+                    <div class="kpi-title">Active Labs</div>
+                    <div class="kpi-value">6,022</div>
+                </div>
+                <div class="kpi-card card-teachers" onclick="activateHeatmap('Teachers', this)">
+                    <div class="kpi-title">Teachers Staffed</div>
+                    <div class="kpi-value">3.1L</div>
+                </div>
+                <div class="kpi-card card-electricity" onclick="activateHeatmap('Electricity', this)">
+                    <div class="kpi-title">Grid Connect</div>
+                    <div class="kpi-value">99.1%</div>
+                </div>
+                <div class="kpi-card card-sanitation" onclick="activateHeatmap('Sanitation', this)">
+                    <div class="kpi-title">WASH Audited</div>
+                    <div class="kpi-value">92%</div>
+                </div>
+                <div class="kpi-card card-blocks" onclick="activateHeatmap('Active Blocks', this)">
+                    <div class="kpi-title">Active Blocks</div>
+                    <div class="kpi-value">412</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let currentMetric = 'Total Schools';
+
+        // MOCK DATA: Simulating API response for district metrics
+        const mockDistrictData = {
+            "Chennai": { "Total Schools": 1200, "Attendance": 92, "NEET Qualified": 1500, "Hi-Tech Labs": 95, "status": "green" },
+            "Coimbatore": { "Total Schools": 950, "Attendance": 89, "NEET Qualified": 1200, "Hi-Tech Labs": 88, "status": "green" },
+            "Madurai": { "Total Schools": 800, "Attendance": 75, "NEET Qualified": 600, "Hi-Tech Labs": 45, "status": "yellow" },
+            "Villupuram": { "Total Schools": 1100, "Attendance": 62, "NEET Qualified": 200, "Hi-Tech Labs": 20, "status": "red" }
+            // Note: Extend this object to map directly to the 'district_name' property in your GeoJSON
+        };
+
+        function initMap() {
+            // Center on Tamil Nadu
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                center: { lat: 11.1271, lng: 78.6569 },
+                styles: [
+                    { "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }] },
+                    { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+                    { "elementType": "labels.text.fill", "stylers": [{ "color": "#616161" }] },
+                    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f5f5f5" }] },
+                    { "featureType": "administrative.land_parcel", "elementType": "labels.text.fill", "stylers": [{ "color": "#bdbdbd" }] }
+                ]
+            });
+
+            // Load District Polygons
+            // REQUIRED: Ensure 'tn_districts.geojson' is hosted locally or available via relative path
+            map.data.loadGeoJson('tn_districts.geojson');
+
+            // Apply Dynamic Heatmap Styling
+            map.data.setStyle(function(feature) {
+                let districtName = feature.getProperty('district_name'); // Ensure this matches your GeoJSON property
+                let color = '#cccccc'; // Default missing data
+                
+                if (mockDistrictData[districtName]) {
+                    let status = mockDistrictData[districtName].status;
+                    // Logic to adjust color based on currentMetric would execute here in production
+                    if (status === 'green') color = 'rgba(46, 204, 113, 0.6)';
+                    if (status === 'yellow') color = 'rgba(241, 196, 15, 0.6)';
+                    if (status === 'red') color = 'rgba(231, 76, 60, 0.6)';
+                }
+
+                return {
+                    fillColor: color,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 1.5,
+                    fillOpacity: 0.8
+                };
+            });
+
+            // Interactivity: District Click Drill-Down
+            map.data.addListener('click', function(event) {
+                let district = event.feature.getProperty('district_name');
+                console.log("Drill-down triggered for: " + district);
+                // Future integration: Load individual school pins for selected district
+            });
+        }
+
+        function activateHeatmap(metric, element) {
+            // Update UI state
+            document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            
+            currentMetric = metric;
+            console.log("Heatmap updated for: " + metric);
+            
+            // Re-trigger map styling logic
+            if(map) {
+                // In a live environment, fetch new mockDistrictData here based on metric, then update style
+                map.data.setStyle(map.data.getStyle()); 
+            }
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>
