@@ -1,165 +1,130 @@
 'use client';
 
 import { District } from '@/types';
-import { FaTimes, FaMapMarkerAlt } from 'react-icons/fa';
 import { useDashboardStore } from '@/store/useDashboardStore';
-import { 
-  School, 
-  UserCheck, 
-  GraduationCap, 
-  FlaskConical, 
-  Users, 
-  Zap, 
-  Droplet, 
-  Map as MapIcon
-} from 'lucide-react';
+import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Map as MapIcon, X, MapPin } from 'lucide-react';
 
 interface RightPanelProps {
   selectedDistrict: District | null;
   onClearDistrict: () => void;
 }
 
-export default function RightPanel({
-  selectedDistrict,
-  onClearDistrict,
-}: RightPanelProps) {
-  const { selectedMetric } = useDashboardStore();
+const metricRows = [
+  { key: 'total_schools' as const,    label: 'Total Schools',    icon: <School size={14} />,       color: '#3498db', isPercent: false },
+  { key: 'attendance' as const,       label: 'Attendance',       icon: <UserCheck size={14} />,    color: '#2ecc71', isPercent: true  },
+  { key: 'neet_qualified' as const,   label: 'NEET Qualified',   icon: <GraduationCap size={14} />,color: '#9b59b6', isPercent: false },
+  { key: 'hi_tech_labs' as const,     label: 'Hi-Tech Labs',     icon: <FlaskConical size={14} />, color: '#e74c3c', isPercent: true  },
+  { key: 'teachers_staffed' as const, label: 'Teachers Staffed', icon: <Users size={14} />,        color: '#1abc9c', isPercent: true  },
+  { key: 'electricity' as const,      label: 'Grid Connect',     icon: <Zap size={14} />,          color: '#f1c40f', isPercent: true  },
+  { key: 'wash_audited' as const,     label: 'WASH Audited',     icon: <Droplet size={14} />,      color: '#34495e', isPercent: true  },
+  { key: 'active_blocks' as const,    label: 'Active Blocks',    icon: <MapIcon size={14} />,      color: '#e67e22', isPercent: false },
+];
 
+export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
+  const { selectedMetric } = useDashboardStore();
   const metrics = selectedDistrict?.metrics;
 
-  const formatNumber = (num: number | undefined) => num ? new Intl.NumberFormat('en-IN').format(num) : 'N/A';
-  const formatPercentage = (num: number | undefined) => num !== undefined ? num + '%' : 'N/A';
+  const fmt = (val: number | undefined, isPercent: boolean) =>
+    val != null ? (isPercent ? `${val}%` : new Intl.NumberFormat('en-IN').format(val)) : '—';
 
   return (
     <aside
-      className="flex flex-col gap-4 h-full overflow-y-auto glass-panel border border-slate-200/50 shadow-lg relative z-40 custom-scrollbar"
+      className="flex flex-col h-full flex-shrink-0 overflow-y-auto"
       style={{
-        width: '320px',
-        minWidth: '320px',
-        borderRadius: '24px',
-        padding: '24px 16px',
-        background: 'rgba(255, 255, 255, 0.85)',
+        width: '300px',
+        minWidth: '300px',
+        background: '#ffffff',
+        borderLeft: '1px solid #e0e6ed',
+        padding: '20px 16px',
       }}
     >
       {selectedDistrict ? (
-        // ── VIEW: District Details Profile ───────────────────────────────────
-        <div className="flex flex-col gap-4 h-full">
+        <div className="flex flex-col gap-4 h-full animate-slide-in">
           {/* Header */}
-          <div className="flex items-start justify-between border-b border-slate-200 pb-3">
-            <div>
-              <div className="flex items-center gap-1.5 text-blue-600">
-                <FaMapMarkerAlt size={12} />
-                <span className="text-[10px] font-extrabold uppercase tracking-widest">
-                  DISTRICT PROFILE
-                </span>
+          <div style={{ borderBottom: '1px solid #e0e6ed', paddingBottom: '14px' }}>
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-1.5 mb-1" style={{ color: '#3498db' }}>
+                  <MapPin size={11} />
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest">District Profile</span>
+                </div>
+                <h2 className="text-xl font-black" style={{ color: '#2c3e50' }}>
+                  {selectedDistrict.district_name}
+                </h2>
+                <div className="text-[11px] font-bold mt-0.5" style={{ color: '#7f8c8d' }}>
+                  LGD CODE: {selectedDistrict.lgd_code}
+                </div>
               </div>
-              <h2 className="text-xl font-black text-slate-900 mt-1 leading-tight">
-                {selectedDistrict.district_name}
-              </h2>
-              <span className="text-[10px] text-slate-500 font-bold block mt-0.5">
-                LGD CODE: {selectedDistrict.lgd_code}
-              </span>
+              <button
+                onClick={onClearDistrict}
+                className="rounded-lg p-1.5 transition-all"
+                style={{ border: '1px solid #e0e6ed', color: '#7f8c8d' }}
+                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#f4f7f6'; }}
+                onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent'; }}
+                aria-label="Clear district"
+              >
+                <X size={12} />
+              </button>
             </div>
-            <button
-              onClick={onClearDistrict}
-              className="text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 p-1.5 rounded-lg border border-slate-200/50 bg-white/50"
-              aria-label="Clear selected district"
-            >
-              <FaTimes size={11} />
-            </button>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-lg text-xs border border-slate-200 text-slate-700 font-medium leading-relaxed">
-            <strong>Active Metric:</strong> You are currently viewing the map based on <strong className="text-blue-600">{selectedMetric.replace('_', ' ').toUpperCase()}</strong>.
-            <br/><br/>
-            Block-level data drill-down is coming soon.
+          {/* Active Metric Banner */}
+          <div style={{ background: '#f4f7f6', borderRadius: '8px', padding: '10px 12px', border: '1px solid #e0e6ed' }}>
+            <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#7f8c8d' }}>
+              Active Metric
+            </div>
+            <div className="text-sm font-bold" style={{ color: '#2c3e50' }}>
+              {selectedMetric.replace(/_/g, ' ').toUpperCase()}
+            </div>
           </div>
 
-          {/* Details list */}
-          <div className="flex-1 flex flex-col gap-3 mt-2">
-            <h3 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">
+          {/* Metrics Grid */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#7f8c8d' }}>
               Performance Metrics
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-blue-500">
-                  <School size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Total Schools</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {metricRows.map(row => (
+                <div
+                  key={row.key}
+                  className="flex items-center justify-between rounded-lg px-3 py-2.5"
+                  style={{
+                    border: `1px solid ${selectedMetric === row.key ? row.color + '40' : '#e0e6ed'}`,
+                    background: selectedMetric === row.key ? row.color + '08' : '#fff',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: row.color }}>{row.icon}</span>
+                    <span className="text-xs font-semibold" style={{ color: '#7f8c8d' }}>
+                      {row.label}
+                    </span>
+                  </div>
+                  <span className="text-sm font-black" style={{ color: '#2c3e50' }}>
+                    {fmt(metrics?.[row.key], row.isPercent)}
+                  </span>
                 </div>
-                <span className="text-lg font-black text-slate-800">{formatNumber(metrics?.total_schools)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-emerald-500">
-                  <UserCheck size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Attendance</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatPercentage(metrics?.attendance)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-purple-500">
-                  <GraduationCap size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">NEET Qualified</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatNumber(metrics?.neet_qualified)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-red-500">
-                  <FlaskConical size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Hi-Tech Labs</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatPercentage(metrics?.hi_tech_labs)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-teal-500">
-                  <Users size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Teachers</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatPercentage(metrics?.teachers_staffed)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-yellow-500">
-                  <Zap size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Electricity</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatPercentage(metrics?.electricity)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <Droplet size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">WASH</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatPercentage(metrics?.wash_audited)}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-orange-500">
-                  <MapIcon size={14} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Active Blocks</span>
-                </div>
-                <span className="text-lg font-black text-slate-800">{formatNumber(metrics?.active_blocks)}</span>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       ) : (
-        // ── VIEW: Info Placeholder (No district selected) ────────────────────
-        <div className="flex flex-col items-center justify-center h-full text-center p-4">
-          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-4 border border-blue-100 shadow-sm">
-            <FaMapMarkerAlt size={24} className="animate-bounce" style={{ animationDuration: '2.5s' }} />
+        /* Empty State */
+        <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in" style={{ gap: '12px' }}>
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ background: '#EFF6FF', border: '1px solid #BFDBFE' }}
+          >
+            <MapPin size={26} style={{ color: '#3b82f6', animation: 'bounce 2s infinite' }} />
           </div>
-          <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-            Explore Districts
-          </h3>
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-            Hover over a district to view basic stats, or click to lock its profile view here.
-          </p>
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-wider" style={{ color: '#2c3e50' }}>
+              Explore Districts
+            </h3>
+            <p className="text-xs mt-2 leading-relaxed max-w-[200px]" style={{ color: '#7f8c8d' }}>
+              Hover over a district to view basic stats, or click to lock its profile view here.
+            </p>
+          </div>
         </div>
       )}
     </aside>

@@ -1,44 +1,81 @@
 'use client';
 
+import { Search } from 'lucide-react';
+
 interface HeaderProps {
   loading: boolean;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
-export default function Header({ loading }: HeaderProps) {
+export default function Header({ loading, searchQuery = '', onSearchChange }: HeaderProps) {
   return (
-    <header className="flex items-center justify-between gap-4 px-6 py-4 glass-panel border-b border-slate-200/50 shadow-sm relative z-50">
+    <header className="vs-header flex-shrink-0">
       {/* Brand */}
-      <div className="flex items-center gap-4 min-w-0">
-        {/* Emblem */}
+      <div className="flex items-center gap-3">
         <div
-          className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-md relative overflow-hidden"
-          style={{ 
-            background: 'linear-gradient(135deg, #2563EB 0%, #0891B2 100%)',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
-          }}
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-black flex-shrink-0"
+          style={{ background: 'linear-gradient(135deg, #2563EB 0%, #0891B2 100%)' }}
         >
           VS
         </div>
-        <div className="min-w-0">
-          <h1 className="text-lg font-black text-slate-900 tracking-wider leading-none uppercase">
+        <div>
+          <h1 className="text-[15px] font-black tracking-wider uppercase" style={{ color: '#2c3e50' }}>
             VEDA-SAKTHI
           </h1>
-          <p className="text-xs font-semibold text-slate-500 mt-1">
-            {"Minister's Command View \u00A0·\u00A0 Tamil Nadu Education Analytics"}
+          <p className="text-[11px] font-medium" style={{ color: '#7f8c8d' }}>
+            {"Minister's Command View · Tamil Nadu Education Analytics"}
           </p>
         </div>
       </div>
 
-      {/* Right panel indicators */}
+      {/* Center Search */}
+      {onSearchChange && (
+        <div className="flex-1 max-w-sm mx-10 relative hidden md:block">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none" style={{ color: '#7f8c8d' }}>
+            <Search size={14} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search districts..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full text-sm rounded-lg pl-9 pr-4 py-2 outline-none transition-all"
+            style={{
+              background: '#f4f7f6',
+              border: '1px solid #e0e6ed',
+              color: '#2c3e50',
+              fontSize: '13px',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#3498db';
+              e.target.style.background = '#fff';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#e0e6ed';
+              e.target.style.background = '#f4f7f6';
+            }}
+          />
+        </div>
+      )}
+
+      {/* Right — Status */}
       <div className="flex items-center gap-3">
-        {/* LIVE indicator */}
-        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-2 rounded-xl text-xs font-bold tracking-wider shadow-sm">
+        <div
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider"
+          style={{ background: '#e9faf2', color: '#27ae60', border: '1px solid #b8f0d4' }}
+        >
           <span
-            className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-            style={{ animation: 'dotPulse 1.8s infinite' }}
+            className="w-2 h-2 rounded-full"
+            style={{ background: '#2ecc71', animation: 'dotPulse 1.8s infinite' }}
           />
           LIVE
         </div>
+        {loading && (
+          <div className="text-xs font-semibold" style={{ color: '#7f8c8d' }}>
+            Syncing...
+          </div>
+        )}
       </div>
     </header>
   );

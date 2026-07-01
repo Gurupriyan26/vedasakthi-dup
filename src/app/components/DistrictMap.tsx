@@ -26,117 +26,71 @@ interface DistrictMapProps {
   selectedDistrictId: number | null;
 }
 
-// Map color configuration
-const COLORS = {
-  green: '#2ecc71',
-  yellow: '#f1c40f',
-  red: '#e74c3c',
-  default: '#cccccc'
-};
+// Matching reference HTML colors exactly
+const COLORS = { green: '#2ecc71', yellow: '#f1c40f', red: '#e74c3c', default: '#cbd5e1' };
 
-const getMetricColor = (metric: MetricType, value?: number) => {
-  if (value === undefined || value === null) return COLORS.default;
-
+function getMetricColor(metric: MetricType, value?: number): string {
+  if (value == null) return COLORS.default;
   switch (metric) {
-    case 'attendance':
-      if (value >= 90) return COLORS.green;
-      if (value >= 75) return COLORS.yellow;
-      return COLORS.red;
-    case 'electricity':
-      if (value >= 98) return COLORS.green;
-      if (value >= 90) return COLORS.yellow;
-      return COLORS.red;
+    case 'attendance':       return value >= 90 ? COLORS.green : value >= 75 ? COLORS.yellow : COLORS.red;
+    case 'electricity':      return value >= 98 ? COLORS.green : value >= 90 ? COLORS.yellow : COLORS.red;
     case 'hi_tech_labs':
     case 'teachers_staffed':
-    case 'wash_audited':
-      if (value >= 90) return COLORS.green;
-      if (value >= 80) return COLORS.yellow;
-      return COLORS.red;
-    case 'total_schools':
-      if (value >= 1000) return COLORS.green;
-      if (value >= 500) return COLORS.yellow;
-      return COLORS.red;
-    case 'neet_qualified':
-      if (value >= 1000) return COLORS.green;
-      if (value >= 500) return COLORS.yellow;
-      return COLORS.red;
-    case 'active_blocks':
-      if (value >= 12) return COLORS.green;
-      if (value >= 8) return COLORS.yellow;
-      return COLORS.red;
-    default:
-      return COLORS.default;
+    case 'wash_audited':     return value >= 90 ? COLORS.green : value >= 80 ? COLORS.yellow : COLORS.red;
+    case 'total_schools':    return value >= 1000 ? COLORS.green : value >= 500 ? COLORS.yellow : COLORS.red;
+    case 'neet_qualified':   return value >= 1000 ? COLORS.green : value >= 500 ? COLORS.yellow : COLORS.red;
+    case 'active_blocks':    return value >= 12 ? COLORS.green : value >= 8 ? COLORS.yellow : COLORS.red;
+    default: return COLORS.default;
   }
-};
+}
 
-export default function DistrictMap({
-  districts,
-  loading,
-  onDistrictSelect,
-  selectedDistrictId,
-}: DistrictMapProps) {
+export default function DistrictMap({ districts, loading, onDistrictSelect, selectedDistrictId }: DistrictMapProps) {
   const { selectedMetric } = useDashboardStore();
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
 
-  // ── Fetch GeoJSON once ────────────────────────────────────────────────────
   useEffect(() => {
     fetch('/geojson/tamil-nadu-districts.json')
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<FeatureCollection>;
-      })
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() as Promise<FeatureCollection>; })
       .then(setGeoData)
-      .catch((e) => setGeoError(String(e)));
+      .catch(e => setGeoError(String(e)));
   }, []);
 
-  // ── Re-style GeoJSON layer when selection or metric changes ────────────────
+  const getDistrictFromFeature = (feature: Feature) => {
+    const props = feature.properties as { dtname?: string; dist?: string; district?: string };
+    const geoName = props?.dtname ?? props?.dist ?? props?.district ?? '';
+    const resolvedName = resolveDistrictName(geoName);
+    return { resolvedName, district: districts.find(d => d.district_name.toLowerCase() === resolvedName.toLowerCase()) };
+  };
+
+  // Re-style on metric / selection change
   useEffect(() => {
     if (!geoJsonLayerRef.current) return;
     geoJsonLayerRef.current.eachLayer((layer: Layer) => {
       const gLayer = layer as L.Path & { feature?: Feature };
       if (!gLayer.feature) return;
-
-      const geoName: string =
-        (gLayer.feature.properties as { dtname?: string; dist?: string; district?: string })?.dtname ??
-        (gLayer.feature.properties as { dist?: string })?.dist ??
-        (gLayer.feature.properties as { district?: string })?.district ??
-        '';
-      const resolvedName = resolveDistrictName(geoName);
-      const districtRow = districts.find(
-        (d) => d.district_name.toLowerCase() === resolvedName.toLowerCase()
-      );
-      
-      const isSelected = selectedDistrictId !== null && districtRow?.id === selectedDistrictId;
-      const metricValue = districtRow?.metrics ? districtRow.metrics[selectedMetric] : undefined;
-      const metricColor = getMetricColor(selectedMetric, typeof metricValue === 'number' ? metricValue : undefined);
-
+      const { district } = getDistrictFromFeature(gLayer.feature);
+      const isSelected = selectedDistrictId !== null && district?.id === selectedDistrictId;
+      const value = district?.metrics ? Number(district.metrics[selectedMetric]) : undefined;
       gLayer.setStyle({
-        fillColor: metricColor,
+        fillColor: getMetricColor(selectedMetric, value),
         color: isSelected ? '#333' : '#ffffff',
         fillOpacity: 0.8,
         weight: isSelected ? 3 : 1.5,
         opacity: 1,
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [districts, selectedDistrictId, selectedMetric]);
 
-  // ── Style function for initial render ────────────────────────────────────
-  const styleFeature = (feature?: Feature<Geometry, { dtname?: string; dist?: string; district?: string }>): PathOptions => {
+  const styleFeature = (feature?: Feature<Geometry>): PathOptions => {
     if (!feature) return {};
-    const geoName = feature.properties?.dtname ?? feature.properties?.dist ?? feature.properties?.district ?? '';
-    const resolvedName = resolveDistrictName(geoName);
-    const districtRow = districts.find(
-      (d) => d.district_name.toLowerCase() === resolvedName.toLowerCase()
-    );
-    
-    const isSelected = selectedDistrictId !== null && districtRow?.id === selectedDistrictId;
-    const metricValue = districtRow?.metrics ? districtRow.metrics[selectedMetric] : undefined;
-    const metricColor = getMetricColor(selectedMetric, typeof metricValue === 'number' ? metricValue : undefined);
-
+    const { district } = getDistrictFromFeature(feature);
+    const isSelected = selectedDistrictId !== null && district?.id === selectedDistrictId;
+    const value = district?.metrics ? Number(district.metrics[selectedMetric]) : undefined;
     return {
-      fillColor: metricColor,
+      fillColor: getMetricColor(selectedMetric, value),
       color: isSelected ? '#333' : '#ffffff',
       fillOpacity: 0.8,
       weight: isSelected ? 3 : 1.5,
@@ -144,83 +98,53 @@ export default function DistrictMap({
     };
   };
 
-  // ── Popup + Tooltip for each feature ────────────────────────────────────
   const onEachFeature: GeoJSONOptions['onEachFeature'] = (feature, layer) => {
-    const geoName: string =
-      (feature.properties as { dtname?: string; dist?: string })?.dtname ??
-      (feature.properties as { dist?: string })?.dist ??
-      '';
-    const resolvedName = resolveDistrictName(geoName);
+    const { resolvedName, district } = getDistrictFromFeature(feature);
+    const metricValue = district?.metrics ? district.metrics[selectedMetric] : null;
+    const displayValue = metricValue != null
+      ? (typeof metricValue === 'number' && ['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited'].includes(selectedMetric)
+          ? `${metricValue}%`
+          : new Intl.NumberFormat('en-IN').format(Number(metricValue)))
+      : 'N/A';
 
-    // Find district row
-    const districtRow = districts.find(
-      (d) => d.district_name.toLowerCase() === resolvedName.toLowerCase()
-    );
-    
-    const metricValue = districtRow?.metrics ? districtRow.metrics[selectedMetric] : 'N/A';
-
-    // Tooltip (hover)
     layer.bindTooltip(
-      `<div style="font-family:Outfit,sans-serif;padding:6px 10px;font-size:12px;color:#000">
-        <strong style="font-size:14px;display:block;margin-bottom:4px">${resolvedName}</strong>
-        <div style="font-weight:600;color:#333;text-transform:uppercase;font-size:10px">${selectedMetric.replace('_', ' ')}</div>
-        <div style="font-size:16px;font-weight:900;color:#000">${metricValue}</div>
-       </div>`,
-      { sticky: true, direction: 'top', className: 'leaflet-tooltip-custom-light', offset: [0, -4] }
+      `<div style="font-family:Inter,sans-serif;padding:8px 12px">
+        <strong style="font-size:13px;display:block;color:#2c3e50">${resolvedName}</strong>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;font-weight:600;margin-top:2px">${selectedMetric.replace(/_/g,' ')}</div>
+        <div style="font-size:18px;font-weight:900;color:#2c3e50;margin-top:2px">${displayValue}</div>
+      </div>`,
+      { sticky: true, direction: 'top', className: 'leaflet-tooltip-gov', offset: [0, -4] }
     );
 
-    // Click behavior
     const path = layer as L.Path;
     layer.on({
-      click: () => {
-        if (districtRow) {
-          onDistrictSelect(districtRow);
-        }
-      },
-      mouseover: () => {
-        const isSelected = selectedDistrictId !== null && districtRow?.id === selectedDistrictId;
-        path.setStyle({ 
-          weight: isSelected ? 3 : 2.5, 
-          fillOpacity: 1 
-        });
-        path.bringToFront();
-      },
-      mouseout: () => {
-        if (geoJsonLayerRef.current) {
-          geoJsonLayerRef.current.resetStyle(layer as L.Path);
-        }
-      },
+      click: () => { if (district) onDistrictSelect(district); },
+      mouseover: () => { path.setStyle({ weight: 3, fillOpacity: 1 }); path.bringToFront(); },
+      mouseout: () => { if (geoJsonLayerRef.current) geoJsonLayerRef.current.resetStyle(layer as L.Path); },
     });
   };
 
-  const geoKey = `tn-districts-${districts.length}-${selectedMetric}`;
-
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full" style={{ background: '#f4f7f6' }}>
       {loading && (
-        <div className="absolute inset-0 z-[1001] flex items-center justify-center bg-white/75 backdrop-blur-sm rounded-2xl border border-slate-200">
-          <div className="text-center space-y-3">
-            <div
-              className="w-10 h-10 rounded-full border-4 border-blue-500 border-t-transparent mx-auto"
-              style={{ animation: 'spin 0.8s linear infinite' }}
-            />
-            <p className="text-sm font-semibold text-slate-700">Loading map data…</p>
+        <div className="absolute inset-0 z-[1001] flex items-center justify-center" style={{ background: 'rgba(244,247,246,0.8)', backdropFilter: 'blur(4px)' }}>
+          <div className="text-center">
+            <div className="w-10 h-10 rounded-full border-4 mx-auto mb-3" style={{ borderColor: '#3498db', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+            <p className="text-sm font-semibold" style={{ color: '#7f8c8d' }}>Loading map data…</p>
           </div>
         </div>
       )}
 
       {geoError && (
-        <div className="absolute inset-0 z-[1001] flex items-center justify-center bg-red-50 border border-red-200 rounded-2xl">
-          <p className="text-sm text-red-600 font-medium text-center px-6">
-            ⚠️ Failed to load GeoJSON: {geoError}
-          </p>
+        <div className="absolute inset-0 z-[1001] flex items-center justify-center" style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px' }}>
+          <p className="text-sm font-medium text-center px-6" style={{ color: '#dc2626' }}>⚠️ Failed to load GeoJSON: {geoError}</p>
         </div>
       )}
 
       <MapContainer
         center={[11.1271, 78.6569]}
         zoom={7}
-        style={{ width: '100%', height: '100%', borderRadius: '16px' }}
+        style={{ width: '100%', height: '100%' }}
         zoomControl={false}
         scrollWheelZoom
       >
@@ -228,36 +152,42 @@ export default function DistrictMap({
           attribution='&copy; OpenStreetMap &copy; CARTO'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
-
         <ZoomControl position="topright" />
-
         {geoData && !loading && (
           <GeoJSON
-            key={geoKey}
+            key={`tn-${districts.length}-${selectedMetric}`}
             data={geoData}
             style={styleFeature as GeoJSONOptions['style']}
             onEachFeature={onEachFeature}
-            ref={(ref) => {
-              if (ref) geoJsonLayerRef.current = ref;
-            }}
+            ref={ref => { if (ref) geoJsonLayerRef.current = ref; }}
           />
         )}
       </MapContainer>
-      
-      {/* Legend */}
-      <div className="absolute bottom-4 right-4 z-[1000] bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-slate-200 text-xs font-semibold text-slate-700 flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.green }}></div>
-          <span>Good</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.yellow }}></div>
-          <span>Average</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.red }}></div>
-          <span>Needs Attention</span>
-        </div>
+
+      {/* Map Legend — matching reference HTML */}
+      <div
+        className="absolute bottom-5 right-5 z-[1000]"
+        style={{
+          background: 'rgba(255,255,255,0.95)',
+          border: '1px solid #e0e6ed',
+          borderRadius: '8px',
+          padding: '10px 14px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          fontSize: '12px',
+          fontWeight: 600,
+          color: '#2c3e50',
+        }}
+      >
+        {[
+          { color: COLORS.green,  label: 'Good' },
+          { color: COLORS.yellow, label: 'Average' },
+          { color: COLORS.red,    label: 'Needs Attention' },
+        ].map(({ color, label }) => (
+          <div key={label} className="flex items-center gap-2 py-0.5">
+            <div style={{ width: 14, height: 14, borderRadius: 3, background: color }} />
+            <span>{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
