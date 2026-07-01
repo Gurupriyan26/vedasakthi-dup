@@ -7,15 +7,15 @@ import Sidebar from './components/Sidebar';
 import RightPanel from './components/RightPanel';
 import ChartsSection from './components/ChartsSection';
 import { useDashboard } from '@/hooks/useDashboard';
+import { RefreshCw } from 'lucide-react';
 
-// Leaflet requires browser APIs — disable SSR
 const DistrictMap = dynamic(() => import('./components/DistrictMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: '#f4f7f6' }}>
+    <div className="w-full h-full flex items-center justify-center" style={{ background: '#0d1520' }}>
       <div className="text-center">
-        <div className="w-10 h-10 rounded-full border-4 mx-auto mb-3" style={{ borderColor: '#3498db', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
-        <p className="text-sm font-semibold" style={{ color: '#7f8c8d' }}>Loading map…</p>
+        <div className="w-12 h-12 rounded-full border-4 mx-auto mb-4" style={{ borderColor: '#3b82f6', borderTopColor: 'transparent', animation: 'spin 0.9s linear infinite' }} />
+        <p className="text-sm font-semibold" style={{ color: '#475569' }}>Rendering map…</p>
       </div>
     </div>
   ),
@@ -41,63 +41,62 @@ export default function DashboardPage() {
     return districts.filter(d => d.district_name.toLowerCase().includes(q));
   }, [districts, searchQuery]);
 
+  // Skeleton loading shell
   if (!mounted) {
     return (
-      <div className="flex flex-col h-screen" style={{ background: '#f4f7f6', overflow: 'hidden' }}>
+      <div className="flex flex-col h-screen" style={{ background: 'var(--bg)', overflow: 'hidden' }}>
         <div className="vs-header">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg" style={{ background: 'linear-gradient(135deg,#2563EB,#0891B2)' }} />
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg,#3b82f6,#6366f1)' }} />
             <div>
-              <div className="skeleton h-4 w-28 mb-1" />
-              <div className="skeleton h-3 w-40" />
+              <div className="skeleton h-4 w-32 mb-1.5" />
+              <div className="skeleton h-3 w-48" />
             </div>
           </div>
         </div>
         <div className="flex flex-1 overflow-hidden">
-          <div style={{ width: 340, background: '#f4f7f6', borderRight: '1px solid #e0e6ed', padding: 16 }}>
+          <div style={{ width: 320, background: 'var(--surface)', borderRight: '1px solid var(--border)', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="skeleton h-24 rounded-xl" />
             <div className="grid grid-cols-2 gap-2">
-              {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-16 rounded-xl" />)}
+              {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-20 rounded-xl" />)}
             </div>
           </div>
-          <div className="flex-1 skeleton m-2 rounded-xl" />
-          <div style={{ width: 300, borderLeft: '1px solid #e0e6ed' }} />
+          <div className="flex-1 skeleton m-3 rounded-2xl" />
+          <div style={{ width: 300, background: 'var(--surface)', borderLeft: '1px solid var(--border)' }} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: '#f4f7f6', overflow: 'hidden' }}>
-      {/* ── Header ── */}
+    <div className="flex flex-col h-screen" style={{ background: 'var(--bg)', overflow: 'hidden' }}>
       <Header loading={loading} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* ── Body ── */}
       <div className="flex flex-1 overflow-hidden">
-
-        {/* Left Sidebar */}
         <Sidebar districts={filteredDistricts} loading={loading} />
 
-        {/* Center — Map + Charts */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {error ? (
-            <div className="flex-1 flex items-center justify-center" style={{ background: '#f4f7f6' }}>
+            <div className="flex-1 flex items-center justify-center">
               <div className="text-center max-w-sm px-6">
-                <div className="text-4xl mb-4">⚠️</div>
-                <h2 className="text-lg font-bold mb-2" style={{ color: '#2c3e50' }}>Failed to load data</h2>
-                <p className="text-sm mb-4" style={{ color: '#7f8c8d' }}>{error}</p>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <span className="text-3xl">⚠️</span>
+                </div>
+                <h2 className="text-lg font-bold mb-2" style={{ color: '#f1f5f9' }}>Connection failed</h2>
+                <p className="text-sm mb-5" style={{ color: '#64748b', lineHeight: 1.6 }}>{error}</p>
                 <button
                   onClick={retry}
-                  className="px-6 py-2 text-white text-sm font-semibold rounded-lg"
-                  style={{ background: '#3498db' }}
+                  className="flex items-center gap-2 mx-auto px-6 py-2.5 text-white text-sm font-semibold rounded-xl transition-all hover:opacity-80"
+                  style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)' }}
                 >
-                  Retry
+                  <RefreshCw size={14} /> Retry
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 16px 16px' }}>
-              {/* Map */}
-              <div style={{ height: '65vh', minHeight: 420, borderRadius: 0, overflow: 'hidden', border: '1px solid #e0e6ed', borderTop: 'none' }}>
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Map — fills the full height */}
+              <div className="flex-1 relative" style={{ minHeight: 420 }}>
                 <DistrictMap
                   districts={filteredDistricts}
                   loading={loading}
@@ -106,15 +105,24 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Charts */}
+              {/* Charts — collapsible scrollable strip at bottom */}
               {!loading && filteredDistricts.length > 0 && (
-                <ChartsSection districts={filteredDistricts} />
+                <div
+                  className="overflow-y-auto flex-shrink-0"
+                  style={{
+                    maxHeight: '42vh',
+                    background: 'var(--surface)',
+                    borderTop: '1px solid var(--border)',
+                    padding: '16px 20px 20px',
+                  }}
+                >
+                  <ChartsSection districts={filteredDistricts} />
+                </div>
               )}
             </div>
           )}
         </main>
 
-        {/* Right Panel */}
         <RightPanel
           selectedDistrict={selectedDistrict}
           onClearDistrict={() => setSelectedDistrictId(null)}

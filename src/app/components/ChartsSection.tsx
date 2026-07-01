@@ -9,23 +9,30 @@ interface ChartsSectionProps {
   districts: District[];
 }
 
-const getMetricColor = (metric: MetricType, value: number): string => {
-  const g = '#2ecc71', y = '#f1c40f', r = '#e74c3c';
-  switch (metric) {
-    case 'attendance':       return value >= 90 ? g : value >= 75 ? y : r;
-    case 'electricity':      return value >= 98 ? g : value >= 90 ? y : r;
-    case 'hi_tech_labs':
-    case 'teachers_staffed':
-    case 'wash_audited':     return value >= 90 ? g : value >= 80 ? y : r;
-    case 'total_schools':    return value >= 1000 ? g : value >= 500 ? y : r;
-    case 'neet_qualified':   return value >= 1000 ? g : value >= 500 ? y : r;
-    case 'active_blocks':    return value >= 12 ? g : value >= 8 ? y : r;
-    default: return '#3b82f6';
-  }
+const PALETTE = {
+  good:      '#10B981',
+  average:   '#F59E0B',
+  attention: '#EF4444',
+  nodata:    '#1e293b',
 };
 
-const isPercent = (m: MetricType) =>
-  ['attendance','hi_tech_labs','teachers_staffed','electricity','wash_audited'].includes(m);
+function getMetricColor(metric: MetricType, value?: number): string {
+  if (value == null) return PALETTE.nodata;
+
+  switch (metric) {
+    case 'attendance':       return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
+    case 'electricity':      return value >= 95 ? PALETTE.good : value >= 85 ? PALETTE.average : PALETTE.attention;
+    case 'hi_tech_labs':
+    case 'teachers_staffed':
+    case 'wash_audited':     return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
+    case 'total_schools':    return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
+    case 'neet_qualified':   return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
+    case 'active_blocks':    return value >= 10 ? PALETTE.good : value >= 5 ? PALETTE.average : PALETTE.attention;
+    default: return PALETTE.nodata;
+  }
+}
+
+const PERCENT_METRICS = new Set(['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited']);
 
 export default function ChartsSection({ districts }: ChartsSectionProps) {
   const { selectedMetric } = useDashboardStore();
@@ -46,96 +53,148 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   const top5 = chartData.slice(0, 5);
   const bottom5 = [...chartData].reverse().slice(0, 5);
   const label = selectedMetric.replace(/_/g, ' ').toUpperCase();
-  const fmt = (v: number) => isPercent(selectedMetric) ? `${v}` : new Intl.NumberFormat('en-IN').format(v);
+  const isPercent = PERCENT_METRICS.has(selectedMetric);
+  const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
+
+  // Maximum value for scaling the mini progress bars
+  const maxVal = chartData[0]?.value || 1;
+
+  const renderTable = (data: typeof top5, isTop: boolean) => (
+    <div className="w-full">
+      <div className="w-full text-left">
+        {/* Table Header */}
+        <div className="flex items-center border-b border-slate-800 pb-2 mb-2">
+          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-12 text-center">Rank</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex-1 ml-2">District Name</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-24 text-right pr-2">Metric</div>
+        </div>
+        
+        {/* Table Body */}
+        <div className="flex flex-col gap-1.5">
+          {data.map((d, i) => {
+            const barWidth = Math.max((d.value / maxVal) * 100, 2);
+            return (
+              <div 
+                key={d.name} 
+                className="flex items-center p-1.5 rounded-lg hover:bg-slate-800/60 transition-colors border border-transparent hover:border-slate-700/50"
+              >
+                <div className="w-12 flex justify-center">
+                  <div
+                    className="flex items-center justify-center text-[10px] font-black rounded-md shadow-sm"
+                    style={{ 
+                      width: 22, height: 22, 
+                      background: isTop ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: isTop ? '#10B981' : '#EF4444',
+                      border: `1px solid ${isTop ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
+                    }}
+                  >
+                    {isTop ? i + 1 : chartData.length - 4 + i}
+                  </div>
+                </div>
+                
+                <div className="flex-1 ml-2">
+                  <div className="text-[12px] font-bold text-slate-200">
+                    {d.fullName}
+                  </div>
+                </div>
+                
+                <div className="w-28 flex items-center justify-end gap-2 pr-1">
+                  <div className="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden xl:block">
+                    <div 
+                      className="h-full rounded-full transition-all duration-700" 
+                      style={{ width: `${barWidth}%`, background: isTop ? '#10B981' : '#EF4444' }} 
+                    />
+                  </div>
+                  <div className="text-[13px] font-black min-w-[3rem] text-right" style={{ color: isTop ? '#10B981' : '#EF4444' }}>
+                    {fmt(d.value)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex flex-col gap-3 mt-2 pb-4">
-      {/* Top 5 and Bottom 5 — styled like reference HTML panels */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Top 5 */}
-        <div style={{ background: '#fff', border: '1px solid #e0e6ed', borderRadius: '10px', padding: '16px' }}>
-          <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#7f8c8d' }}>
-            TOP 5 DISTRICTS — {label}
+    <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#020617]">
+      {/* ── Top/Bottom Data Tables ── */}
+      <div className="flex flex-col gap-5 xl:w-[380px] flex-shrink-0">
+        <div className="rounded-xl p-5 bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+          {/* Subtle glow background */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-emerald-500 relative z-10">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10B981]" />
+            Top Performers
           </div>
-          <div className="flex flex-col gap-2">
-            {top5.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
-                    style={{ background: '#3498db', fontSize: '9px' }}
-                  >{i + 1}</span>
-                  <span className="text-sm font-semibold" style={{ color: '#2c3e50' }}>{d.fullName}</span>
-                </div>
-                <span className="text-sm font-black" style={{ color: '#2c3e50' }}>{fmt(d.value)}</span>
-              </div>
-            ))}
+          <div className="relative z-10">
+            {renderTable(top5, true)}
           </div>
         </div>
 
-        {/* Bottom 5 */}
-        <div style={{ background: '#fff', border: '1px solid #e0e6ed', borderRadius: '10px', padding: '16px' }}>
-          <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#7f8c8d' }}>
-            NEEDS ATTENTION — {label}
+        <div className="rounded-xl p-5 bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+          {/* Subtle glow background */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-red-500 relative z-10">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_#EF4444]" />
+            Needs Attention
           </div>
-          <div className="flex flex-col gap-2">
-            {bottom5.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
-                    style={{ background: '#e74c3c', fontSize: '9px' }}
-                  >{i + 1}</span>
-                  <span className="text-sm font-semibold" style={{ color: '#2c3e50' }}>{d.fullName}</span>
-                </div>
-                <span className="text-sm font-black" style={{ color: '#2c3e50' }}>{fmt(d.value)}</span>
-              </div>
-            ))}
+          <div className="relative z-10">
+            {renderTable(bottom5, false)}
           </div>
         </div>
       </div>
 
-      {/* Bar Chart */}
-      <div style={{ background: '#fff', border: '1px solid #e0e6ed', borderRadius: '10px', padding: '16px', height: 320 }}>
-        <div className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: '#7f8c8d' }}>
-          DISTRICT RANKING DISTRIBUTION — {label}
+      {/* ── Bar Chart ── */}
+      <div className="flex-1 rounded-xl p-5 min-h-[300px] bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+        {/* Subtle grid pattern background */}
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
+        
+        <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
+          Distribution Overview — {label}
         </div>
-        <ResponsiveContainer width="100%" height="85%">
-          <BarChart data={chartData} margin={{ top: 4, right: 8, left: -24, bottom: 50 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f7f6" />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 9, fill: '#7f8c8d', fontFamily: 'Inter' }}
-              angle={-45}
-              textAnchor="end"
-              interval={0}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 10, fill: '#7f8c8d', fontFamily: 'Inter' }}
-            />
-            <Tooltip
-              cursor={{ fill: 'rgba(244,247,246,0.8)' }}
-              contentStyle={{
-                borderRadius: '8px',
-                border: '1px solid #e0e6ed',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                fontFamily: 'Inter',
-                fontSize: '12px',
-                color: '#2c3e50',
-              }}
-              formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
-            />
-            <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-              {chartData.map((entry, i) => (
-                <Cell key={i} fill={getMetricColor(selectedMetric, entry.value)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="relative z-10 w-full h-[320px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+              <XAxis
+                dataKey="name"
+                axisLine={{ stroke: '#334155' }}
+                tickLine={false}
+                tick={false}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fill: '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+              />
+              <Tooltip
+                cursor={{ fill: '#1e293b' }}
+                contentStyle={{
+                  background: '#020617',
+                  borderRadius: '12px',
+                  border: '1px solid #1e293b',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '12px',
+                  color: '#f8fafc',
+                  padding: '14px',
+                  boxShadow: '0 20px 40px -10px rgba(0,0,0,0.5)'
+                }}
+                itemStyle={{ color: '#f8fafc', fontWeight: 900 }}
+                labelStyle={{ color: '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
+                formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
+              />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                {chartData.map((entry, i) => (
+                  <Cell key={i} fill={getMetricColor(selectedMetric, entry.value)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

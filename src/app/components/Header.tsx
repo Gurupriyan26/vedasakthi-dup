@@ -1,6 +1,7 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { Search, X } from 'lucide-react';
 
 interface HeaderProps {
   loading: boolean;
@@ -9,73 +10,92 @@ interface HeaderProps {
 }
 
 export default function Header({ loading, searchQuery = '', onSearchChange }: HeaderProps) {
+  const [focused, setFocused] = useState(false);
+
   return (
     <header className="vs-header flex-shrink-0">
       {/* Brand */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-shrink-0">
         <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-black flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, #2563EB 0%, #0891B2 100%)' }}
+          className="flex-shrink-0 flex items-center justify-center text-white text-[13px] font-black"
+          style={{
+            width: 36, height: 36,
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+            letterSpacing: '0.04em',
+          }}
         >
           VS
         </div>
         <div>
-          <h1 className="text-[15px] font-black tracking-wider uppercase" style={{ color: '#2c3e50' }}>
+          <h1 className="text-[15px] font-black uppercase tracking-widest leading-none text-slate-100">
             VEDA-SAKTHI
           </h1>
-          <p className="text-[11px] font-medium" style={{ color: '#7f8c8d' }}>
-            {"Minister's Command View · Tamil Nadu Education Analytics"}
+          <p className="text-[11px] font-semibold mt-0.5 text-slate-500">
+            Command View · TN Analytics
           </p>
         </div>
       </div>
 
-      {/* Center Search */}
+      {/* ── Sleek Dark Search Bar ── */}
       {onSearchChange && (
-        <div className="flex-1 max-w-sm mx-10 relative hidden md:block">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none" style={{ color: '#7f8c8d' }}>
-            <Search size={14} />
-          </div>
-          <input
-            type="text"
-            placeholder="Search districts..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full text-sm rounded-lg pl-9 pr-4 py-2 outline-none transition-all"
+        <div className="flex-1 max-w-md mx-8 hidden md:block">
+          <div
+            className="relative flex items-center transition-all duration-300"
             style={{
-              background: '#f4f7f6',
-              border: '1px solid #e0e6ed',
-              color: '#2c3e50',
-              fontSize: '13px',
+              background: focused ? '#1e293b' : '#0f172a',
+              border: focused ? '1px solid #3b82f6' : '1px solid #1e293b',
+              borderRadius: '8px',
+              boxShadow: focused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
             }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#3498db';
-              e.target.style.background = '#fff';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#e0e6ed';
-              e.target.style.background = '#f4f7f6';
-            }}
-          />
+          >
+            <div className="absolute left-3 flex items-center pointer-events-none" style={{ color: focused ? '#3b82f6' : '#64748b' }}>
+              <Search size={14} strokeWidth={2.5} />
+            </div>
+
+            <input
+              type="text"
+              placeholder="Search districts..."
+              value={searchQuery}
+              onChange={e => onSearchChange(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              className="w-full bg-transparent outline-none text-slate-200 placeholder-slate-500"
+              style={{
+                padding: '8px 32px 8px 36px',
+                fontSize: '13px',
+                fontWeight: 600,
+              }}
+            />
+
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-2 flex items-center justify-center transition-all hover:bg-slate-700"
+                style={{
+                  width: 20, height: 20, borderRadius: '4px',
+                  color: '#94a3b8', cursor: 'pointer', border: 'none', background: 'transparent'
+                }}
+              >
+                <X size={12} strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Right — Status */}
-      <div className="flex items-center gap-3">
-        <div
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider"
-          style={{ background: '#e9faf2', color: '#27ae60', border: '1px solid #b8f0d4' }}
-        >
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ background: '#2ecc71', animation: 'dotPulse 1.8s infinite' }}
-          />
-          LIVE
-        </div>
+      {/* Right Status */}
+      <div className="flex items-center gap-4 flex-shrink-0">
         {loading && (
-          <div className="text-xs font-semibold" style={{ color: '#7f8c8d' }}>
+          <div className="flex items-center gap-2 text-[12px] font-semibold text-slate-400">
+            <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #334155', borderTopColor: '#3b82f6', animation: 'spin 0.8s linear infinite' }} />
             Syncing...
           </div>
         )}
+        <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ animation: 'dotPulse 2s infinite' }} />
+          LIVE
+        </div>
       </div>
     </header>
   );
