@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 
 export type MetricType = 
+  | 'general'
+  | 'infra_status'
   | 'total_schools'
   | 'attendance'
   | 'neet_qualified'
@@ -18,7 +20,7 @@ interface DashboardState {
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
-  selectedMetric: 'total_schools', // Default metric
+  selectedMetric: 'general', // Default metric
   selectedDistrictId: null,
   setMetric: (metric) => set({ selectedMetric: metric }),
   setSelectedDistrictId: (id) => set({ selectedDistrictId: id }),

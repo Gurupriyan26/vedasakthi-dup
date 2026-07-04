@@ -2,82 +2,66 @@
 
 import { District } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
-import { School, GraduationCap, Map as MapIcon, X, Activity, UserCheck, FlaskConical, Users, Zap, Droplet } from 'lucide-react';
-import { PieChart, Pie, Cell } from 'recharts';
+import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Layers, TrendingUp, Activity, X } from 'lucide-react';
 
 interface RightPanelProps {
   selectedDistrict: District | null;
   onClearDistrict: () => void;
 }
 
-const PALETTE = {
-  good:      '#10B981', // Emerald
-  average:   '#F59E0B', // Amber
-  attention: '#EF4444', // Red
-};
-
-function getColor(val: number) {
-  if (val >= 85) return PALETTE.good;
-  if (val >= 70) return PALETTE.average;
-  return PALETTE.attention;
+const getActiveBorder = (color: string) => {
+  switch(color) {
+    case 'blue': return 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]';
+    case 'emerald': return 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.15)]';
+    case 'purple': return 'border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.15)]';
+    case 'rose': return 'border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.15)]';
+    case 'teal': return 'border-teal-500 shadow-[0_0_15px_rgba(20,184,166,0.15)]';
+    case 'amber': return 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.15)]';
+    case 'indigo': return 'border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]';
+    default: return 'border-[#1e293b]';
+  }
 }
 
-// Ultra-premium gauge component
-function MetricGauge({ label, value, icon, onClick }: { label: string, value: number, icon: React.ReactNode, onClick: () => void }) {
-  const color = getColor(value);
-  const data = [
-    { name: 'Value', value: value },
-    { name: 'Remainder', value: 100 - value }
-  ];
+const getActiveText = (color: string) => {
+  switch(color) {
+    case 'blue': return 'text-blue-500';
+    case 'emerald': return 'text-emerald-500';
+    case 'purple': return 'text-purple-500';
+    case 'rose': return 'text-rose-500';
+    case 'teal': return 'text-teal-500';
+    case 'amber': return 'text-amber-500';
+    case 'indigo': return 'text-indigo-500';
+    default: return 'text-white';
+  }
+}
 
-  return (
-    <button 
-      onClick={onClick}
-      className="flex flex-col items-center justify-center p-4 bg-[#0a0f1c] rounded-2xl border border-[#1e293b] hover:border-slate-600 transition-all group shadow-sm hover:shadow-lg relative overflow-hidden"
-    >
-      <div className="absolute top-3 left-3 text-slate-500 group-hover:text-slate-300 transition-colors">
-        {icon}
-      </div>
-      
-      <div className="relative w-20 h-20 mt-2">
-        <PieChart width={80} height={80}>
-          <Pie
-            data={data}
-            cx={36}
-            cy={36}
-            innerRadius={28}
-            outerRadius={36}
-            startAngle={90}
-            endAngle={-270}
-            dataKey="value"
-            stroke="none"
-            cornerRadius={4}
-          >
-            <Cell fill={color} style={{ filter: `drop-shadow(0px 0px 4px ${color}80)` }} />
-            <Cell fill="#1e293b" />
-          </Pie>
-        </PieChart>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none mt-[-4px] ml-[-4px]">
-          <span className="text-[13px] font-black text-white">{value.toFixed(0)}%</span>
-        </div>
-      </div>
-      
-      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 group-hover:text-white transition-colors">{label}</span>
-    </button>
-  );
+const getBadgeStyle = (color: string) => {
+  switch(color) {
+    case 'blue': return 'bg-blue-500/10 text-blue-400';
+    case 'emerald': return 'bg-emerald-500/10 text-emerald-400';
+    case 'purple': return 'bg-purple-500/10 text-purple-400';
+    case 'rose': return 'bg-rose-500/10 text-rose-400';
+    case 'teal': return 'bg-teal-500/10 text-teal-400';
+    case 'amber': return 'bg-amber-500/10 text-amber-400';
+    case 'indigo': return 'bg-indigo-500/10 text-indigo-400';
+    default: return 'bg-slate-500/10 text-slate-400';
+  }
 }
 
 export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
-  const { setMetric } = useDashboardStore();
+  const { setMetric, selectedMetric } = useDashboardStore();
 
   if (!selectedDistrict) {
     return (
-      <aside className="hidden xl:flex flex-col w-[380px] flex-shrink-0 bg-[#020617] border-l border-[#1e293b] p-6 items-center justify-center">
-        <div className="w-24 h-24 rounded-full border border-slate-800 flex items-center justify-center mb-6 shadow-inner bg-[#0a0f1c]">
-          <Activity size={32} className="text-slate-700" />
+      <aside className="hidden xl:flex flex-col w-[380px] flex-shrink-0 bg-[#020617] border-l border-[#1e293b] p-6 items-center justify-center z-20 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] pointer-events-none" />
+        
+        <div className="w-24 h-24 rounded-[2rem] border border-[#1e293b] flex items-center justify-center mb-8 bg-[#0a0f1c] shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+          <Activity size={36} className="text-slate-700" />
         </div>
-        <p className="text-slate-500 font-medium tracking-wide text-center text-[13px]">
-          Select a district from the map <br/> to analyze performance data.
+        <h3 className="text-white font-bold text-lg mb-2">No District Selected</h3>
+        <p className="text-slate-500 font-medium tracking-wide text-center text-[13px] leading-relaxed max-w-[250px]">
+          Click on any district boundary on the map to unlock its detailed telemetry and performance data.
         </p>
       </aside>
     );
@@ -85,92 +69,84 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
 
   const { metrics } = selectedDistrict;
 
-  const getNum = (key: keyof NonNullable<typeof metrics>) => Number(metrics?.[key]) || 0;
-
-  const attendance = getNum('attendance');
-  const hiTech = getNum('hi_tech_labs');
-  const teachers = getNum('teachers_staffed');
-  const grid = getNum('electricity');
-  const wash = getNum('wash_audited');
-
-  const absoluteMetrics = [
-    { key: 'total_schools', label: 'Total Schools', value: metrics?.total_schools, icon: <School size={16} /> },
-    { key: 'neet_qualified', label: 'NEET Qual.', value: metrics?.neet_qualified, icon: <GraduationCap size={16} /> },
-    { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks, icon: <MapIcon size={16} /> },
+  const kpiCards = [
+    { key: 'total_schools', label: 'TOTAL SCHOOLS', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), icon: <School size={20} strokeWidth={1.5} />, color: 'blue', trend: '+124', trendIcon: true },
+    { key: 'attendance', label: 'ATTENDANCE', value: `${Number(metrics?.attendance) || 0}%`, icon: <UserCheck size={20} strokeWidth={1.5} />, color: 'emerald', trend: '+1.2%', trendIcon: true },
+    { key: 'neet_qualified', label: 'NEET QUALIFIED', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_qualified) || 0), icon: <GraduationCap size={20} strokeWidth={1.5} />, color: 'purple', trend: '+14%', trendIcon: true },
+    { key: 'active_blocks', label: 'ACTIVE BLOCKS', value: metrics?.active_blocks || 0, icon: <Layers size={20} strokeWidth={1.5} />, color: 'amber', trend: 'Live', trendIcon: true },
+    { key: 'teachers_staffed', label: 'TEACHERS', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.teachers_staffed) || 0), icon: <Users size={20} strokeWidth={1.5} />, color: 'teal', trend: '+890', trendIcon: true },
+    { key: 'electricity', label: 'ELECTRICITY', value: `${Number(metrics?.electricity) || 0}%`, icon: <Zap size={20} strokeWidth={1.5} />, color: 'amber', trend: '+0.5%', trendIcon: true },
+    { key: 'hi_tech_labs', label: 'LAB FACILITIES', value: `${Number(metrics?.hi_tech_labs) || 0}%`, icon: <FlaskConical size={20} strokeWidth={1.5} />, color: 'rose', trend: '+3.4%', trendIcon: true },
+    { key: 'wash_audited', label: 'SANITATION', value: `${Number(metrics?.wash_audited) || 0}%`, icon: <Droplet size={20} strokeWidth={1.5} />, color: 'indigo', trend: '+2.1%', trendIcon: true },
   ];
 
   return (
-    <aside className="hidden xl:flex flex-col w-[380px] flex-shrink-0 bg-[#020617] border-l border-[#1e293b] h-full overflow-y-auto custom-scrollbar shadow-2xl z-20">
+    <aside className="hidden xl:flex flex-col w-[380px] flex-shrink-0 bg-[#020617] border-l border-[#1e293b] h-full overflow-y-auto custom-scrollbar shadow-2xl z-20 relative">
       
-      {/* ── Ultra Clean Header ── */}
-      <div className="relative p-6 border-b border-[#1e293b] bg-[#020617]">
-        <button 
-          onClick={onClearDistrict}
-          className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-[#1e293b] transition"
-        >
-          <X size={16} />
-        </button>
-
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1 flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          District Profile
+      {/* ── Header ── */}
+      <div className="sticky top-0 z-10 pt-6 px-6 pb-2 bg-[#020617]/95 backdrop-blur-xl flex items-end justify-between border-b border-transparent">
+        <div className="flex flex-col">
+          <span className="text-[12px] font-black uppercase tracking-widest text-slate-300">
+            Command Metrics
+          </span>
+          <span className="text-2xl font-black text-white tracking-tight mt-1 truncate max-w-[200px]">
+            {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
+          </span>
         </div>
-        <h2 className="text-3xl font-black text-white tracking-tight mb-4">
-          {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
-        </h2>
-        
-        <div className="flex gap-2">
-          <div className="px-2.5 py-1 rounded bg-[#0a0f1c] border border-[#1e293b] text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            LGD: {selectedDistrict.id}
-          </div>
-          <div className="px-2.5 py-1 rounded bg-[#0a0f1c] border border-[#1e293b] text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Activity size={10} className="text-emerald-500" /> Live Data
-          </div>
+        <div className="flex items-center gap-4">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            District Avg
+          </span>
+          <button 
+            onClick={onClearDistrict}
+            className="p-1.5 rounded-full text-slate-500 hover:text-white hover:bg-[#1e293b] transition-all bg-[#0a0f1c] border border-[#1e293b]"
+          >
+            <X size={14} />
+          </button>
         </div>
       </div>
 
-      <div className="p-6 flex-1 flex flex-col gap-8">
-        
-        {/* ── Core Infrastructure Stats ── */}
-        <div>
-          <div className="text-[11px] font-black uppercase tracking-widest text-slate-600 mb-4 px-1">
-            Infrastructure Baseline
-          </div>
-          <div className="grid grid-cols-1 gap-3">
-            {absoluteMetrics.map(m => (
-              <button
-                key={m.key}
-                onClick={() => setMetric(m.key as any)}
-                className="flex items-center justify-between p-4 bg-[#0a0f1c] rounded-2xl border border-[#1e293b] hover:border-slate-500 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1e293b] flex items-center justify-center text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
-                    {m.icon}
+      {/* ── Dark Mode KPI Cards ── */}
+      <div className="p-4 flex flex-col gap-3">
+        {kpiCards.map(card => {
+          const isActive = selectedMetric === card.key;
+          return (
+            <button
+              key={card.key}
+              onClick={() => setMetric(card.key as any)}
+              className={`
+                flex flex-row items-center justify-between p-4 rounded-[14px] transition-all w-full text-left
+                ${isActive 
+                  ? `bg-[#0b1120] border ${getActiveBorder(card.color)}` 
+                  : 'bg-[#0b1120] border border-[#1e293b] hover:border-[#334155]'
+                }
+              `}
+            >
+              <div className="flex items-center gap-4">
+                {/* Icon Container */}
+                <div className="w-[42px] h-[42px] rounded-2xl bg-[#1e293b]/60 flex items-center justify-center text-slate-400">
+                  {card.icon}
+                </div>
+                
+                {/* Text Col */}
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-black uppercase text-slate-300 tracking-[0.08em]">
+                    {card.label}
+                  </span>
+                  <div className={`mt-1 inline-flex items-center gap-1 px-1.5 py-[2px] rounded-[4px] text-[10px] font-bold w-fit ${getBadgeStyle(card.color)}`}>
+                    {card.trendIcon && <TrendingUp size={10} strokeWidth={3} />}
+                    {card.trend}
                   </div>
-                  <span className="text-[12px] font-bold text-slate-300 uppercase tracking-wider">{m.label}</span>
                 </div>
-                <div className="text-[18px] font-black text-white group-hover:text-blue-400 transition-colors">
-                  {m.value || 0}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Performance Gauges ── */}
-        <div>
-          <div className="text-[11px] font-black uppercase tracking-widest text-slate-600 mb-4 px-1 flex items-center gap-2">
-            Performance Indexes
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <MetricGauge label="Attendance" value={attendance} icon={<UserCheck size={14}/>} onClick={() => setMetric('attendance')} />
-            <MetricGauge label="Hi-Tech Labs" value={hiTech} icon={<FlaskConical size={14}/>} onClick={() => setMetric('hi_tech_labs')} />
-            <MetricGauge label="Teachers" value={teachers} icon={<Users size={14}/>} onClick={() => setMetric('teachers_staffed')} />
-            <MetricGauge label="Grid Connect" value={grid} icon={<Zap size={14}/>} onClick={() => setMetric('electricity')} />
-            <MetricGauge label="Wash Audit" value={wash} icon={<Droplet size={14}/>} onClick={() => setMetric('wash_audited')} />
-          </div>
-        </div>
-
+              </div>
+              
+              {/* Right Value */}
+              <div className={`text-[22px] font-black ${isActive ? getActiveText(card.color) : 'text-white'}`}>
+                {card.value}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </aside>
   );

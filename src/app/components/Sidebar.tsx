@@ -15,7 +15,7 @@ const metricsList = [
   { key: 'active_blocks' as MetricType,    label: 'Active Blocks',    trend: 'Live',   accent: '#f97316', icon: <MapIcon size={16} /> },
 ];
 
-const overallStats = {
+const overallStats: Record<string, string> = {
   total_schools: '40,000+',
   attendance: '88.5%',
   neet_qualified: '14,205',

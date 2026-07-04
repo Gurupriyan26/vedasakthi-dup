@@ -33,11 +33,28 @@ const PALETTE = {
   nodata:    '#1e293b', // slate-800
 };
 
-function getMetricColor(metric: MetricType, value?: number): string {
+function getGeneralColor(id: number): string {
+  const colors = [
+    '#3b82f6', // blue
+    '#8b5cf6', // violet
+    '#ec4899', // pink
+    '#10b981', // emerald
+    '#f59e0b', // amber
+    '#14b8a6', // teal
+  ];
+  return colors[id % colors.length];
+}
+
+function getMetricColor(metric: MetricType, value?: number, districtId?: number): string {
+  if (metric === 'general') {
+    return districtId ? getGeneralColor(districtId) : '#1e293b';
+  }
+
   if (value == null) return PALETTE.nodata;
 
   switch (metric) {
     case 'attendance':       return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
+    case 'infra_status':     return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
     case 'electricity':      return value >= 95 ? PALETTE.good : value >= 85 ? PALETTE.average : PALETTE.attention;
     case 'hi_tech_labs':
     case 'teachers_staffed':
@@ -49,7 +66,7 @@ function getMetricColor(metric: MetricType, value?: number): string {
   }
 }
 
-const PERCENT_METRICS = new Set(['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited']);
+const PERCENT_METRICS = new Set(['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited', 'infra_status']);
 
 export default function DistrictMap({ districts, loading, onDistrictSelect, selectedDistrictId }: DistrictMapProps) {
   const { selectedMetric } = useDashboardStore();
@@ -71,13 +88,24 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
     return { resolvedName, district: districts.find(d => d.district_name.toLowerCase() === resolvedName.toLowerCase()) };
   };
 
+  const getMetricValue = (district?: District) => {
+    if (!district?.metrics) return undefined;
+    if (selectedMetric === 'infra_status') {
+      const grid = Number(district.metrics.electricity) || 0;
+      const wash = Number(district.metrics.wash_audited) || 0;
+      const labs = Number(district.metrics.hi_tech_labs) || 0;
+      return (grid + wash + labs) / 3;
+    }
+    return Number(district.metrics[selectedMetric as keyof typeof district.metrics]);
+  };
+
   const buildStyle = (district: District | undefined, isSelected: boolean): PathOptions => {
-    const value = district?.metrics ? Number(district.metrics[selectedMetric]) : undefined;
-    const fill = getMetricColor(selectedMetric, value);
+    const value = getMetricValue(district);
+    const fill = getMetricColor(selectedMetric, value, district?.id);
     return {
       fillColor: fill,
       color: isSelected ? '#ffffff' : '#020617', // white border when selected, slate-950 otherwise
-      fillOpacity: isSelected ? 1 : 0.85,
+      fillOpacity: isSelected ? 1 : (selectedMetric === 'general' ? 0.4 : 0.85),
       weight: isSelected ? 3 : 1,
       opacity: 1,
     };
@@ -104,15 +132,17 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
 
   const onEachFeature: GeoJSONOptions['onEachFeature'] = (feature, layer) => {
     const { resolvedName, district } = getDistrictFromFeature(feature);
-    const metricValue = district?.metrics ? district.metrics[selectedMetric] : null;
+    const metricValue = getMetricValue(district);
     const isPercent = PERCENT_METRICS.has(selectedMetric);
-    const displayValue = metricValue != null
-      ? (isPercent ? `${metricValue}%` : new Intl.NumberFormat('en-IN').format(Number(metricValue)))
-      : 'No data';
+    
+    let displayValue = 'N/A';
+    if (selectedMetric === 'general') {
+      displayValue = district ? `LGD: ${district.id}` : 'N/A';
+    } else if (metricValue != null) {
+      displayValue = isPercent ? `${Math.round(metricValue)}%` : new Intl.NumberFormat('en-IN').format(Number(metricValue));
+    }
 
-    const color = district?.metrics
-      ? getMetricColor(selectedMetric, Number(metricValue))
-      : '#334155';
+    const color = getMetricColor(selectedMetric, metricValue, district?.id);
 
     layer.bindTooltip(
       `<div style="font-family:Inter,sans-serif;padding:12px;min-width:160px;background:#0f172a;border-radius:8px;border:1px solid #1e293b;">
@@ -182,35 +212,24 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
         )}
       </MapContainer>
 
-      {/* Highly Catchy Premium HUD Legend - Compact Version */}
-      <div className="absolute bottom-6 right-6 z-[1000] bg-[#020617]/80 backdrop-blur-xl rounded-xl p-3 border border-[#1e293b] shadow-[0_10px_40px_rgba(0,0,0,0.7)] flex flex-col min-w-[160px]">
-        <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#1e293b]/80">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-          <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">Telemetry Scale</span>
-        </div>
-        
-        <div className="flex flex-col gap-1.5">
+      {/* Host Required Performance Legend */}
+      {selectedMetric !== 'general' && (
+        <div className="absolute bottom-6 right-6 z-[1000] bg-[#020617]/95 backdrop-blur-xl rounded-xl p-4 border border-[#1e293b] shadow-[0_10px_40px_rgba(0,0,0,0.7)] flex flex-col gap-2.5">
           {[
-            { color: PALETTE.good,      label: 'Optimal', sub: 'Target Achieved' },
-            { color: PALETTE.average,   label: 'Monitor', sub: 'Requires Review' },
-            { color: PALETTE.attention, label: 'Critical', sub: 'Immediate Action' },
-            { color: PALETTE.nodata,    label: 'Offline', sub: 'Awaiting Data' },
-          ].map(({ color, label, sub }) => (
-            <div key={label} className="flex items-center gap-2.5 group cursor-default">
+            { color: PALETTE.good,      label: 'High Performance' },
+            { color: PALETTE.average,   label: 'Average' },
+            { color: PALETTE.attention, label: 'Needs Attention' },
+          ].map(({ color, label }) => (
+            <div key={label} className="flex items-center gap-3 group cursor-default">
               <div 
-                className="relative flex items-center justify-center w-5 h-5 rounded-full bg-[#0f172a] transition-all group-hover:scale-110"
-                style={{ border: `1px solid ${color}40` }}
-              >
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 8px ${color}` }} />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black text-slate-200 uppercase tracking-wider group-hover:text-white transition-colors">{label}</span>
-                <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-0.5">{sub}</span>
-              </div>
+                className="w-3.5 h-3.5 rounded-[3px]"
+                style={{ background: color, boxShadow: `0 0 8px ${color}80` }}
+              />
+              <span className="text-[12px] font-bold text-slate-200">{label}</span>
             </div>
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
