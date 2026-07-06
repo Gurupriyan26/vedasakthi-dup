@@ -63,14 +63,14 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   return (
     <div className="flex flex-col xl:flex-row p-3 bg-transparent">
       {/* ── Bar Chart ── */}
-      <div className="flex-1 rounded-xl p-4 min-h-[180px] bg-white/50 border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md">
+      <div className="flex-1 rounded-xl p-4 min-h-[120px] bg-white/50 border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md">
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         
         <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[260px]">
+        <div className="relative z-10 w-full h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
