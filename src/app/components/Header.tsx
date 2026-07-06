@@ -13,44 +13,26 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
   const [focused, setFocused] = useState(false);
 
   return (
-    <header className="vs-header flex-shrink-0 bg-white border-b border-slate-200">
-      {/* Brand */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        <div
-          className="flex-shrink-0 flex items-center justify-center text-white text-[13px] font-black"
-          style={{
-            width: 36, height: 36,
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
-            letterSpacing: '0.04em',
-          }}
-        >
-          VS
-        </div>
-        <div>
-          <h1 className="text-[15px] font-black uppercase tracking-widest leading-none text-slate-800">
-            VEDA-SAKTHI
-          </h1>
-          <p className="text-[11px] font-semibold mt-0.5 text-slate-500">
-            Command View · TN Analytics
-          </p>
-        </div>
-      </div>
+    <header className="flex-shrink-0 bg-white border-b border-[#e0e6ed] shadow-[0_2px_4px_rgba(0,0,0,0.05)] px-[30px] py-[15px] flex justify-between items-center z-10">
+      {/* Brand Title from Reference */}
+      <h1 className="m-0 text-[20px] font-semibold text-[#2c3e50]">
+        Vedasakthi | Hon. Minister's Command View
+      </h1>
 
-      {/* ── Sleek Dark Search Bar ── */}
+      {/* Optional Search Bar - Styled cleanly */}
       {onSearchChange && (
         <div className="flex-1 max-w-md mx-8 hidden md:block">
           <div
             className="relative flex items-center transition-all duration-300"
             style={{
-              background: focused ? '#f1f5f9' : '#f8fafc',
-              border: focused ? '1px solid #3b82f6' : '1px solid #e2e8f0',
-              borderRadius: '8px',
-              boxShadow: focused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
+              background: '#ffffff',
+              border: focused ? '1px solid #3498db' : '1px solid #e0e6ed',
+              borderRadius: '6px',
+              boxShadow: focused ? '0 0 0 2px rgba(52,152,219,0.1)' : 'none',
             }}
           >
-            <div className="absolute left-3 flex items-center pointer-events-none" style={{ color: focused ? '#3b82f6' : '#64748b' }}>
-              <Search size={14} strokeWidth={2.5} />
+            <div className="absolute left-3 flex items-center pointer-events-none" style={{ color: focused ? '#3498db' : '#7f8c8d' }}>
+              <Search size={16} strokeWidth={2} />
             </div>
 
             <input
@@ -60,24 +42,23 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
               onChange={e => onSearchChange(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              className="w-full bg-transparent outline-none text-slate-800 placeholder-slate-400"
+              className="w-full bg-transparent outline-none text-[#2c3e50] placeholder-[#7f8c8d]"
               style={{
                 padding: '8px 32px 8px 36px',
-                fontSize: '13px',
-                fontWeight: 600,
+                fontSize: '14px',
               }}
             />
 
             {searchQuery && (
               <button
                 onClick={() => onSearchChange('')}
-                className="absolute right-2 flex items-center justify-center transition-all hover:bg-slate-200"
+                className="absolute right-2 flex items-center justify-center transition-all hover:bg-[#f4f7f6]"
                 style={{
-                  width: 20, height: 20, borderRadius: '4px',
-                  color: '#94a3b8', cursor: 'pointer', border: 'none', background: 'transparent'
+                  width: 24, height: 24, borderRadius: '4px',
+                  color: '#7f8c8d', cursor: 'pointer', border: 'none', background: 'transparent'
                 }}
               >
-                <X size={12} strokeWidth={2.5} />
+                <X size={14} strokeWidth={2} />
               </button>
             )}
           </div>
@@ -85,16 +66,15 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
       )}
 
       {/* Right Status */}
-      <div className="flex items-center gap-4 flex-shrink-0">
+      <div className="flex items-center gap-4 flex-shrink-0 text-[14px] font-semibold text-[#2c3e50]">
         {loading && (
-          <div className="flex items-center gap-2 text-[12px] font-semibold text-slate-500">
-            <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #cbd5e1', borderTopColor: '#3b82f6', animation: 'spin 0.8s linear infinite' }} />
+          <div className="flex items-center gap-2 text-[#7f8c8d]">
+            <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #e0e6ed', borderTopColor: '#3498db', animation: 'spin 0.8s linear infinite' }} />
             Syncing...
           </div>
         )}
-        <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ animation: 'dotPulse 2s infinite' }} />
-          LIVE
+        <div>
+          System Status: <span style={{ color: '#2ecc71' }}>LIVE</span>
         </div>
       </div>
     </header>
