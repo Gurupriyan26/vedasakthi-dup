@@ -61,9 +61,9 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
 
   return (
-    <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#f4f7f6]">
+    <div className="flex flex-col xl:flex-row p-3 bg-transparent">
       {/* ── Bar Chart ── */}
-      <div className="flex-1 rounded-xl p-5 min-h-[180px] bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
+      <div className="flex-1 rounded-xl p-4 min-h-[180px] bg-white/50 border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md">
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         

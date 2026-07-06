@@ -94,9 +94,9 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden relative">
               {/* Map — fills the full height */}
-              <div className="flex-1 relative" style={{ minHeight: 420 }}>
+              <div className="absolute inset-0 z-0">
                 <DistrictMap
                   districts={filteredDistricts}
                   loading={loading}
@@ -105,15 +105,14 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Charts — collapsible scrollable strip at bottom */}
+              {/* Charts — Floating sleek panel over the map */}
               {!loading && filteredDistricts.length > 0 && (
                 <div
-                  className="overflow-y-auto flex-shrink-0"
+                  className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-[1000] rounded-[24px] shadow-2xl border border-white/60 overflow-hidden"
                   style={{
-                    maxHeight: '32vh',
-                    background: 'var(--surface)',
-                    borderTop: '1px solid var(--border)',
-                    padding: '16px 20px 20px',
+                    background: 'rgba(255, 255, 255, 0.75)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                   }}
                 >
                   <ChartsSection districts={filteredDistricts} />
