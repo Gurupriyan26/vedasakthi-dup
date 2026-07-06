@@ -77,18 +77,17 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 className={`
                   relative flex flex-col justify-between bg-[#1e293b] rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
                   ${isActive 
-                    ? 'ring-1 shadow-lg transform -translate-y-0.5' 
+                    ? 'transform -translate-y-1' 
                     : 'border border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
-                  '--tw-ring-color': isActive ? accent : 'transparent',
-                  borderColor: isActive ? accent : undefined,
+                  boxShadow: isActive ? `0 8px 24px -4px ${accent}40, 0 0 0 1.5px ${accent}` : undefined,
                 } as React.CSSProperties}
               >
                 {/* Micro Gradient Background for Active State */}
                 {isActive && (
-                  <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ background: `linear-gradient(to bottom right, ${accent}, transparent)` }} />
+                  <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${accent}30, transparent 70%)` }} />
                 )}
 
                 <div className="flex flex-col h-full relative z-10 w-full">
