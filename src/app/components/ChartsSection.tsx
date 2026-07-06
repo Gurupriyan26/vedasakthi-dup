@@ -72,22 +72,14 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
         </div>
         <div className="relative z-10 w-full h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 65 }}>
+            <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
                 axisLine={{ stroke: '#cbd5e1' }}
                 tickLine={false}
-                tick={{ 
-                  fontSize: 9, 
-                  fill: '#94a3b8', 
-                  fontFamily: 'Inter, sans-serif', 
-                  fontWeight: 700, 
-                  angle: -45, 
-                  textAnchor: 'end',
-                  dy: 10 
-                }}
-                interval={0}
+                tick={false}
+                height={10}
               />
               <ReferenceLine 
                 y={averageValue} 
