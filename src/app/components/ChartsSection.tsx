@@ -57,32 +57,23 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   return (
     <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#f4f7f6]">
       {/* ── Bar Chart ── */}
-      <div className="flex-1 rounded-xl p-5 min-h-[300px] bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
+      <div className="flex-1 rounded-xl p-5 min-h-[180px] bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         
         <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[350px]">
+        <div className="relative z-10 w-full h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 80 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
                 axisLine={{ stroke: '#cbd5e1' }}
                 tickLine={false}
-                tick={{ 
-                  fontSize: 10, 
-                  fill: '#64748b', 
-                  fontFamily: 'Inter, sans-serif', 
-                  fontWeight: 600, 
-                  angle: -45, 
-                  textAnchor: 'end',
-                  dy: 10 
-                }}
-                interval={0}
-                height={60}
+                tick={false}
+                height={10}
               />
               <YAxis
                 axisLine={false}
@@ -105,7 +96,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                 labelStyle={{ color: '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
                 formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
               />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="value" radius={[20, 20, 20, 20]}>
                 {chartData.map((entry, i) => (
                   <Cell key={i} fill={getMetricColor(selectedMetric, entry.value)} />
                 ))}

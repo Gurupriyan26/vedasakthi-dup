@@ -110,7 +110,7 @@ export default function DashboardPage() {
                 <div
                   className="overflow-y-auto flex-shrink-0"
                   style={{
-                    maxHeight: '42vh',
+                    maxHeight: '32vh',
                     background: 'var(--surface)',
                     borderTop: '1px solid var(--border)',
                     padding: '16px 20px 20px',
