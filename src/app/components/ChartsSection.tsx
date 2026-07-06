@@ -50,104 +50,12 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
 
   if (chartData.length === 0) return null;
 
-  const top5 = chartData.slice(0, 5);
-  const bottom5 = [...chartData].reverse().slice(0, 5);
   const label = selectedMetric.replace(/_/g, ' ').toUpperCase();
   const isPercent = PERCENT_METRICS.has(selectedMetric);
   const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
 
-  // Maximum value for scaling the mini progress bars
-  const maxVal = chartData[0]?.value || 1;
-
-  const renderTable = (data: typeof top5, isTop: boolean) => (
-    <div className="w-full">
-      <div className="w-full text-left">
-        {/* Table Header */}
-        <div className="flex items-center border-b border-slate-200 pb-2 mb-2">
-          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-12 text-center">Rank</div>
-          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex-1 ml-2">District Name</div>
-          <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-24 text-right pr-2">Metric</div>
-        </div>
-        
-        {/* Table Body */}
-        <div className="flex flex-col gap-1.5">
-          {data.map((d, i) => {
-            const barWidth = Math.max((d.value / maxVal) * 100, 2);
-            return (
-              <div 
-                key={d.name} 
-                className="flex items-center p-1.5 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200"
-              >
-                <div className="w-12 flex justify-center">
-                  <div
-                    className="flex items-center justify-center text-[10px] font-black rounded-md shadow-sm"
-                    style={{ 
-                      width: 22, height: 22, 
-                      background: isTop ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                      color: isTop ? '#10B981' : '#EF4444',
-                      border: `1px solid ${isTop ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
-                    }}
-                  >
-                    {isTop ? i + 1 : chartData.length - 4 + i}
-                  </div>
-                </div>
-                
-                <div className="flex-1 ml-2">
-                  <div className="text-[12px] font-bold text-slate-800">
-                    {d.fullName}
-                  </div>
-                </div>
-                
-                <div className="w-28 flex items-center justify-end gap-2 pr-1">
-                  <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden hidden xl:block">
-                    <div 
-                      className="h-full rounded-full transition-all duration-700" 
-                      style={{ width: `${barWidth}%`, background: isTop ? '#10B981' : '#EF4444' }} 
-                    />
-                  </div>
-                  <div className="text-[13px] font-black min-w-[3rem] text-right" style={{ color: isTop ? '#10B981' : '#EF4444' }}>
-                    {fmt(d.value)}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#f4f7f6]">
-      {/* ── Top/Bottom Data Tables ── */}
-      <div className="flex flex-col gap-5 xl:w-[380px] flex-shrink-0">
-        <div className="rounded-xl p-5 bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
-          {/* Subtle glow background */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-emerald-500 relative z-10">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10B981]" />
-            Top Performers
-          </div>
-          <div className="relative z-10">
-            {renderTable(top5, true)}
-          </div>
-        </div>
-
-        <div className="rounded-xl p-5 bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
-          {/* Subtle glow background */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-red-500 relative z-10">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_#EF4444]" />
-            Needs Attention
-          </div>
-          <div className="relative z-10">
-            {renderTable(bottom5, false)}
-          </div>
-        </div>
-      </div>
-
       {/* ── Bar Chart ── */}
       <div className="flex-1 rounded-xl p-5 min-h-[300px] bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
         {/* Subtle grid pattern background */}
