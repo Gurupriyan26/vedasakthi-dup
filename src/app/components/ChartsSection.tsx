@@ -64,15 +64,25 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
         <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[320px]">
+        <div className="relative z-10 w-full h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 80 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
                 axisLine={{ stroke: '#cbd5e1' }}
                 tickLine={false}
-                tick={false}
+                tick={{ 
+                  fontSize: 10, 
+                  fill: '#64748b', 
+                  fontFamily: 'Inter, sans-serif', 
+                  fontWeight: 600, 
+                  angle: -45, 
+                  textAnchor: 'end',
+                  dy: 10 
+                }}
+                interval={0}
+                height={60}
               />
               <YAxis
                 axisLine={false}

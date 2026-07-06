@@ -19,7 +19,7 @@ const getMetricColor = (color: string) => {
   switch(color) {
     case 'blue': return '#3b82f6';
     case 'emerald': return '#10b981';
-    case 'purple': return '#8b5cf6';
+    case 'purple': return '#a855f7';
     case 'amber': return '#f59e0b';
     case 'teal': return '#14b8a6';
     case 'rose': return '#f43f5e';
@@ -42,19 +42,30 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       style={{ 
         width: '350px', 
         zIndex: 10, 
-        background: '#f8fafc',
-        borderRight: '1px solid #e2e8f0',
+        background: '#0f172a',
+        borderRight: '1px solid #1e293b',
       }}
     >
       <div className="p-4">
         
-        {/* ── Instructions Banner ── */}
-        <div className="mb-4 rounded-lg p-2.5 text-[12px] bg-indigo-50 text-indigo-800 border border-indigo-100 shadow-sm flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)] flex-shrink-0" />
-          <span className="leading-tight"><strong>Data Mode:</strong> Select metric to render heatmap.</span>
+        {/* ── Brand Logo Header (Optional, added for coolness) ── */}
+        <div className="mb-6 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <TrendingUp size={18} strokeWidth={2.5} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-[13px] font-black text-white uppercase tracking-widest leading-tight">TN Education</h2>
+            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Analytics Engine</p>
+          </div>
         </div>
 
-        {/* ── Compact Premium Grid ── */}
+        {/* ── Instructions Banner ── */}
+        <div className="mb-5 rounded-lg p-3 text-[11px] bg-[#1e293b] text-slate-300 border border-slate-700/50 flex items-center gap-2.5 shadow-inner">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)] flex-shrink-0" />
+          <span className="leading-relaxed tracking-wide"><strong>DATA MODE:</strong> SELECT METRIC TO RENDER HEATMAP.</span>
+        </div>
+
+        {/* ── Compact Premium Dark Grid ── */}
         <div className="grid grid-cols-2 gap-3">
           {metricsList.map((m) => {
             const isActive = selectedMetric === m.key;
@@ -64,38 +75,39 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 key={m.key}
                 onClick={() => setMetric(m.key)}
                 className={`
-                  relative flex flex-col justify-between bg-white rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between bg-[#1e293b] rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
                   ${isActive 
-                    ? 'ring-1 shadow-md border-transparent transform -translate-y-0.5' 
-                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5'
+                    ? 'ring-1 shadow-lg transform -translate-y-0.5' 
+                    : 'border border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
                   '--tw-ring-color': isActive ? accent : 'transparent',
+                  borderColor: isActive ? accent : undefined,
                 } as React.CSSProperties}
               >
                 {/* Micro Gradient Background for Active State */}
                 {isActive && (
-                  <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ background: accent }} />
+                  <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ background: `linear-gradient(to bottom right, ${accent}, transparent)` }} />
                 )}
 
                 <div className="flex flex-col h-full relative z-10 w-full">
-                  <div className="flex items-center justify-between w-full mb-1.5">
+                  <div className="flex items-center justify-between w-full mb-2">
                     <div 
                       className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
                       style={{ 
-                        backgroundColor: isActive ? accent : '#f1f5f9', 
-                        color: isActive ? '#ffffff' : '#64748b' 
+                        backgroundColor: isActive ? accent : '#0f172a', 
+                        color: isActive ? '#ffffff' : accent 
                       }}
                     >
                       {m.icon}
                     </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
+                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-200'}`}>
                       {m.value}
                     </span>
                   </div>
                   
-                  <span className={`text-[10px] font-extrabold uppercase tracking-wider mt-1 line-clamp-1 ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
+                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-1 ${isActive ? 'text-slate-200' : 'text-slate-400'}`}>
                     {m.label}
                   </span>
                 </div>
@@ -108,8 +120,8 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
       `}} />
     </aside>
   );
