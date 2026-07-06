@@ -77,15 +77,18 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
       )}
 
       {/* Right Status */}
-      <div className="flex items-center gap-4 flex-shrink-0">
+      <div className="flex items-center gap-3 flex-shrink-0">
         {loading && (
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
-            <Activity size={14} className="animate-pulse text-blue-500" />
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded-full bg-slate-800 text-blue-300 border border-slate-700 shadow-sm">
+            <Activity size={14} className="animate-spin" />
             Syncing...
           </div>
         )}
-        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+        <div className="flex items-center gap-2.5 text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded-full bg-slate-900 text-white shadow-md border border-slate-800 hover:bg-slate-800 transition-colors cursor-default">
+          <div className="relative flex items-center justify-center w-2 h-2">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]" />
+          </div>
           System Live
         </div>
       </div>
