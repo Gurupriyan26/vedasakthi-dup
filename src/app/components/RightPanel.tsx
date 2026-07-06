@@ -49,7 +49,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
     { key: 'teachers_staffed', label: 'Teachers Staffed', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.teachers_staffed) || 0), color: 'teal', icon: <Users size={15} strokeWidth={2.5} /> },
     { key: 'electricity', label: 'Grid Connected', value: `${Number(metrics?.electricity) || 0}%`, color: 'yellow', icon: <Zap size={15} strokeWidth={2.5} /> },
     { key: 'hi_tech_labs', label: 'Lab Facilities', value: `${Number(metrics?.hi_tech_labs) || 0}%`, color: 'rose', icon: <FlaskConical size={15} strokeWidth={2.5} /> },
-    { key: 'wash_audited', label: 'WASH Audited', value: `${Number(metrics?.wash_audited) || 0}%`, color: 'indigo', icon: <Droplet size={15} strokeWidth={2.5} /> },
+    { key: 'wash_audited', label: 'Sanitation', value: `${Number(metrics?.wash_audited) || 0}%`, color: 'indigo', icon: <Droplet size={15} strokeWidth={2.5} /> },
   ];
 
   return (

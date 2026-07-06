@@ -11,7 +11,7 @@ const metricsList = [
   { key: 'hi_tech_labs' as MetricType,     label: 'Active Labs',      value: '6,022',   color: 'rose',    icon: <FlaskConical size={15} strokeWidth={2.5} /> },
   { key: 'teachers_staffed' as MetricType, label: 'Teachers Staffed', value: '3.1L',    color: 'teal',    icon: <Users size={15} strokeWidth={2.5} /> },
   { key: 'electricity' as MetricType,      label: 'Grid Connect',     value: '99.1%',   color: 'yellow',  icon: <Zap size={15} strokeWidth={2.5} /> },
-  { key: 'wash_audited' as MetricType,     label: 'WASH Audited',     value: '92%',     color: 'indigo',  icon: <Droplet size={15} strokeWidth={2.5} /> },
+  { key: 'wash_audited' as MetricType,     label: 'Sanitation',       value: '92%',     color: 'indigo',  icon: <Droplet size={15} strokeWidth={2.5} /> },
   { key: 'active_blocks' as MetricType,    label: 'Active Blocks',    value: '412',     color: 'amber',   icon: <MapIcon size={15} strokeWidth={2.5} /> },
 ];
 
