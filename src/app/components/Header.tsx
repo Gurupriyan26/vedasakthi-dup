@@ -29,19 +29,17 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
         </div>
       </div>
 
-      {/* Modern Search Bar */}
+      {/* Modern Premium Search Bar */}
       {onSearchChange && (
         <div className="flex-1 max-w-md mx-8 hidden md:block">
           <div
-            className="relative flex items-center transition-all duration-300"
-            style={{
-              background: focused ? '#ffffff' : '#f8fafc',
-              border: focused ? '1px solid #3b82f6' : '1px solid #e2e8f0',
-              borderRadius: '10px',
-              boxShadow: focused ? '0 0 0 4px rgba(59,130,246,0.1)' : 'none',
-            }}
+            className={`relative flex items-center transition-all duration-300 rounded-full group ${
+              focused 
+                ? 'bg-white ring-2 ring-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)] border-transparent' 
+                : 'bg-slate-100/80 hover:bg-slate-100 border border-slate-200'
+            }`}
           >
-            <div className="absolute left-3 flex items-center pointer-events-none transition-colors" style={{ color: focused ? '#3b82f6' : '#94a3b8' }}>
+            <div className={`absolute left-4 flex items-center pointer-events-none transition-colors duration-300 ${focused ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500'}`}>
               <Search size={16} strokeWidth={2.5} />
             </div>
 
@@ -52,21 +50,24 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
               onChange={e => onSearchChange(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              className="w-full bg-transparent outline-none text-slate-800 placeholder-slate-400 font-medium"
+              className="w-full bg-transparent outline-none text-slate-800 placeholder-slate-400 font-semibold transition-all"
               style={{
-                padding: '9px 36px 9px 40px',
+                padding: '10px 80px 10px 42px',
                 fontSize: '13px',
               }}
             />
 
-            {searchQuery && (
+            {!searchQuery ? (
+              <div className="absolute right-3 flex items-center gap-1 pointer-events-none">
+                <kbd className="hidden sm:inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded shadow-sm">
+                  ⌘K
+                </kbd>
+              </div>
+            ) : (
               <button
                 onClick={() => onSearchChange('')}
-                className="absolute right-2 flex items-center justify-center transition-all hover:bg-slate-200 rounded-md"
-                style={{
-                  width: 24, height: 24,
-                  color: '#64748b', cursor: 'pointer', border: 'none'
-                }}
+                className="absolute right-2 flex items-center justify-center transition-all hover:bg-slate-200 hover:text-slate-700 rounded-full text-slate-400"
+                style={{ width: 24, height: 24 }}
               >
                 <X size={14} strokeWidth={2.5} />
               </button>
