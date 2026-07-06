@@ -15,15 +15,22 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
   return (
     <header className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-6 py-3 flex justify-between items-center z-50 shadow-sm">
       {/* Brand Logo & Title */}
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-500/20">
-          VS
+      <div className="flex items-center gap-3.5">
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg border border-slate-700 overflow-hidden group hover:scale-105 transition-transform duration-300">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay" />
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-50" />
+          <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-br from-indigo-300 to-purple-300 font-black text-[17px] tracking-tighter">
+            VS
+          </span>
         </div>
-        <div className="flex flex-col">
-          <h1 className="m-0 text-[16px] font-bold text-slate-900 tracking-tight leading-none">
+        <div className="flex flex-col justify-center">
+          <h1 className="m-0 text-[19px] font-black text-slate-900 tracking-tight leading-none flex items-center gap-2">
             Vedasakthi
+            <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-1.5 py-0.5 rounded-[4px] text-[8px] uppercase tracking-widest font-black shadow-sm">
+              PRO
+            </span>
           </h1>
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] mt-1">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1.5">
             Hon. Minister's Command View
           </span>
         </div>
