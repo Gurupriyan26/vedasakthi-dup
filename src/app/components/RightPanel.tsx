@@ -13,7 +13,7 @@ const getMetricColor = (color: string) => {
   switch(color) {
     case 'blue': return '#3b82f6';
     case 'emerald': return '#10b981';
-    case 'purple': return '#8b5cf6';
+    case 'purple': return '#a855f7';
     case 'amber': return '#f59e0b';
     case 'teal': return '#14b8a6';
     case 'rose': return '#f43f5e';
@@ -27,12 +27,12 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
 
   if (!selectedDistrict) {
     return (
-      <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#f8fafc] border-l border-slate-200 p-8 items-center justify-center z-20">
-        <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-6 bg-white text-slate-400 shadow-sm">
+      <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#0f172a] border-l border-[#1e293b] p-8 items-center justify-center z-20">
+        <div className="w-20 h-20 rounded-full border border-slate-700 flex items-center justify-center mb-6 bg-slate-800 text-slate-500 shadow-inner">
           <Activity size={32} strokeWidth={1.5} />
         </div>
-        <h3 className="text-slate-800 font-bold text-lg mb-2">No District Selected</h3>
-        <p className="text-slate-500 text-[13px] text-center leading-relaxed">
+        <h3 className="text-white font-bold text-lg mb-2">No District Selected</h3>
+        <p className="text-slate-400 text-[13px] text-center leading-relaxed">
           Select a district on the map to view detailed administrative metrics and performance indicators.
         </p>
       </aside>
@@ -43,7 +43,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
 
   const kpiCards = [
     { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), color: 'blue', icon: <School size={15} strokeWidth={2.5} /> },
-    { key: 'attendance', label: 'Attendance Rate', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
+    { key: 'attendance', label: 'Attendance', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
     { key: 'neet_qualified', label: 'NEET Qualified', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_qualified) || 0), color: 'purple', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
     { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks || 0, color: 'amber', icon: <Layers size={15} strokeWidth={2.5} /> },
     { key: 'teachers_staffed', label: 'Teachers Staffed', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.teachers_staffed) || 0), color: 'teal', icon: <Users size={15} strokeWidth={2.5} /> },
@@ -53,29 +53,29 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
   ];
 
   return (
-    <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#f8fafc] border-l border-slate-200 h-full overflow-y-auto z-20">
+    <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#0f172a] border-l border-[#1e293b] h-full overflow-y-auto z-20">
       
       {/* ── Header ── */}
-      <div className="sticky top-0 z-10 pt-5 px-5 pb-4 bg-[#f8fafc]/90 backdrop-blur-md border-b border-slate-200 flex flex-col gap-1">
+      <div className="sticky top-0 z-10 pt-5 px-5 pb-4 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#1e293b] flex flex-col gap-1">
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] font-extrabold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+          <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.6)]" />
             District Profile
           </span>
           <button 
             onClick={onClearDistrict}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
             aria-label="Clear selection"
           >
             <X size={16} strokeWidth={2.5} />
           </button>
         </div>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight truncate mt-1.5">
+        <h2 className="text-[22px] font-black text-white tracking-tight truncate mt-1.5">
           {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
         </h2>
       </div>
 
-      {/* ── Compact Premium Grid ── */}
+      {/* ── Compact Premium Dark Grid ── */}
       <div className="p-4">
         <div className="grid grid-cols-2 gap-3">
           {kpiCards.map(card => {
@@ -86,38 +86,39 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                 key={card.key}
                 onClick={() => setMetric(card.key as any)}
                 className={`
-                  relative flex flex-col justify-between bg-white rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between bg-[#1e293b] rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
                   ${isActive 
-                    ? 'ring-1 shadow-md border-transparent transform -translate-y-0.5' 
-                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5'
+                    ? 'ring-1 shadow-lg transform -translate-y-0.5' 
+                    : 'border border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
                   '--tw-ring-color': isActive ? accent : 'transparent',
+                  borderColor: isActive ? accent : undefined,
                 } as React.CSSProperties}
               >
                 {/* Micro Gradient Background for Active State */}
                 {isActive && (
-                  <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ background: accent }} />
+                  <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ background: `linear-gradient(to bottom right, ${accent}, transparent)` }} />
                 )}
 
                 <div className="flex flex-col h-full relative z-10 w-full">
-                  <div className="flex items-center justify-between w-full mb-1.5">
+                  <div className="flex items-center justify-between w-full mb-2">
                     <div 
                       className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
                       style={{ 
-                        backgroundColor: isActive ? accent : '#f1f5f9', 
-                        color: isActive ? '#ffffff' : '#64748b' 
+                        backgroundColor: isActive ? accent : '#0f172a', 
+                        color: isActive ? '#ffffff' : accent 
                       }}
                     >
                       {card.icon}
                     </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
+                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-200'}`}>
                       {card.value}
                     </span>
                   </div>
                   
-                  <span className={`text-[10px] font-extrabold uppercase tracking-wider mt-1 line-clamp-1 ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
+                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-1 ${isActive ? 'text-slate-200' : 'text-slate-400'}`}>
                     {card.label}
                   </span>
                 </div>
