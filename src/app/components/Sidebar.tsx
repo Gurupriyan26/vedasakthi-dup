@@ -1,18 +1,18 @@
 'use client';
 
-import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Map as MapIcon, TrendingUp } from 'lucide-react';
+import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Map as MapIcon } from 'lucide-react';
 import { useDashboardStore, MetricType } from '@/store/useDashboardStore';
 import { District } from '@/types';
 
 const metricsList = [
-  { key: 'total_schools' as MetricType,    label: 'Total Schools',    value: '40,000+', color: 'blue',   icon: <School size={16} strokeWidth={2.5} /> },
-  { key: 'attendance' as MetricType,       label: 'Attendance',       value: '88.5%',   color: 'emerald', icon: <UserCheck size={16} strokeWidth={2.5} /> },
-  { key: 'neet_qualified' as MetricType,   label: 'NEET Qualified',   value: '14,205',  color: 'purple',  icon: <GraduationCap size={16} strokeWidth={2.5} /> },
-  { key: 'hi_tech_labs' as MetricType,     label: 'Active Labs',      value: '6,022',   color: 'rose',    icon: <FlaskConical size={16} strokeWidth={2.5} /> },
-  { key: 'teachers_staffed' as MetricType, label: 'Teachers Staffed', value: '3.1L',    color: 'teal',    icon: <Users size={16} strokeWidth={2.5} /> },
-  { key: 'electricity' as MetricType,      label: 'Grid Connect',     value: '99.1%',   color: 'yellow',  icon: <Zap size={16} strokeWidth={2.5} /> },
-  { key: 'wash_audited' as MetricType,     label: 'WASH Audited',     value: '92%',     color: 'indigo',  icon: <Droplet size={16} strokeWidth={2.5} /> },
-  { key: 'active_blocks' as MetricType,    label: 'Active Blocks',    value: '412',     color: 'amber',   icon: <MapIcon size={16} strokeWidth={2.5} /> },
+  { key: 'total_schools' as MetricType,    label: 'Total Schools',    value: '40,000+', color: 'blue',   icon: <School size={18} strokeWidth={2.5} /> },
+  { key: 'attendance' as MetricType,       label: 'Attendance Rate',  value: '88.5%',   color: 'emerald', icon: <UserCheck size={18} strokeWidth={2.5} /> },
+  { key: 'neet_qualified' as MetricType,   label: 'NEET Qualified',   value: '14,205',  color: 'purple',  icon: <GraduationCap size={18} strokeWidth={2.5} /> },
+  { key: 'hi_tech_labs' as MetricType,     label: 'Active Labs',      value: '6,022',   color: 'rose',    icon: <FlaskConical size={18} strokeWidth={2.5} /> },
+  { key: 'teachers_staffed' as MetricType, label: 'Teachers Staffed', value: '3.1L',    color: 'teal',    icon: <Users size={18} strokeWidth={2.5} /> },
+  { key: 'electricity' as MetricType,      label: 'Grid Connect',     value: '99.1%',   color: 'yellow',  icon: <Zap size={18} strokeWidth={2.5} /> },
+  { key: 'wash_audited' as MetricType,     label: 'WASH Audited',     value: '92%',     color: 'indigo',  icon: <Droplet size={18} strokeWidth={2.5} /> },
+  { key: 'active_blocks' as MetricType,    label: 'Active Blocks',    value: '412',     color: 'amber',   icon: <MapIcon size={18} strokeWidth={2.5} /> },
 ];
 
 const getMetricColor = (color: string) => {
@@ -49,8 +49,8 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       <div className="p-5">
         
         {/* ── Instructions Banner ── */}
-        <div className="mb-6 rounded-xl p-3 text-[13px] bg-blue-50 text-blue-800 border border-blue-100 shadow-sm flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+        <div className="mb-6 rounded-xl p-3 text-[13px] bg-indigo-50 text-indigo-800 border border-indigo-100 shadow-sm flex items-center gap-2.5">
+          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
           <span><strong>Data Mode:</strong> Select metric to render heatmap.</span>
         </div>
 
@@ -64,10 +64,10 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 key={m.key}
                 onClick={() => setMetric(m.key)}
                 className={`
-                  relative flex flex-col justify-between bg-white rounded-xl p-4 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between bg-white rounded-2xl p-4 text-left transition-all duration-300 overflow-hidden group
                   ${isActive 
-                    ? 'ring-2 shadow-md border-transparent transform -translate-y-0.5' 
-                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5'
+                    ? 'ring-2 shadow-lg border-transparent transform -translate-y-1' 
+                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-1'
                   }
                 `}
                 style={{
@@ -76,25 +76,30 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
               >
                 {/* Micro Gradient Background for Active State */}
                 {isActive && (
-                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ background: accent }} />
+                  <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ background: accent }} />
                 )}
 
-                <div className="flex items-center gap-2.5 mb-3 relative z-10">
-                  <div 
-                    className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110" 
-                    style={{ backgroundColor: isActive ? `${accent}20` : '#f1f5f9', color: isActive ? accent : '#64748b' }}
-                  >
-                    {m.icon}
+                <div className="flex flex-col h-full relative z-10 w-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <div 
+                      className="p-2 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
+                      style={{ 
+                        backgroundColor: isActive ? accent : '#f1f5f9', 
+                        color: isActive ? '#ffffff' : '#64748b' 
+                      }}
+                    >
+                      {m.icon}
+                    </div>
                   </div>
-                  <span className={`text-[11px] font-extrabold uppercase tracking-wider line-clamp-1 ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
-                    {m.label}
-                  </span>
-                </div>
-                
-                <div className="flex items-end justify-between w-full relative z-10">
-                  <span className={`text-2xl font-black tracking-tight ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
-                    {m.value}
-                  </span>
+                  
+                  <div className="flex flex-col mt-auto w-full">
+                    <span className={`text-[26px] font-black tracking-tight leading-none mb-1.5 ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
+                      {m.value}
+                    </span>
+                    <span className={`text-[10.5px] font-bold uppercase tracking-wider ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
+                      {m.label}
+                    </span>
+                  </div>
                 </div>
               </button>
             );
