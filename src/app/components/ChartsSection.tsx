@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { District } from '@/types';
+import { District, DistrictMetrics } from '@/types';
 import { useDashboardStore, MetricType } from '@/store/useDashboardStore';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -43,7 +43,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
       .map(d => ({
         name: d.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram').replace('Kanniyakumari', 'Kanyakumari'),
         fullName: d.district_name,
-        value: Number(d.metrics![selectedMetric]) || 0,
+        value: Number(d.metrics![selectedMetric as keyof DistrictMetrics]) || 0,
       }))
       .sort((a, b) => b.value - a.value);
   }, [districts, selectedMetric]);
