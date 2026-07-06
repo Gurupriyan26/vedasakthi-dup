@@ -42,21 +42,21 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
   const { metrics } = selectedDistrict;
 
   const kpiCards = [
-    { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), color: 'blue', icon: <School size={18} strokeWidth={2.5} /> },
-    { key: 'attendance', label: 'Attendance', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={18} strokeWidth={2.5} /> },
-    { key: 'neet_qualified', label: 'NEET Qualified', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_qualified) || 0), color: 'purple', icon: <GraduationCap size={18} strokeWidth={2.5} /> },
-    { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks || 0, color: 'amber', icon: <Layers size={18} strokeWidth={2.5} /> },
-    { key: 'teachers_staffed', label: 'Teachers Staffed', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.teachers_staffed) || 0), color: 'teal', icon: <Users size={18} strokeWidth={2.5} /> },
-    { key: 'electricity', label: 'Grid Connected', value: `${Number(metrics?.electricity) || 0}%`, color: 'yellow', icon: <Zap size={18} strokeWidth={2.5} /> },
-    { key: 'hi_tech_labs', label: 'Lab Facilities', value: `${Number(metrics?.hi_tech_labs) || 0}%`, color: 'rose', icon: <FlaskConical size={18} strokeWidth={2.5} /> },
-    { key: 'wash_audited', label: 'WASH Audited', value: `${Number(metrics?.wash_audited) || 0}%`, color: 'indigo', icon: <Droplet size={18} strokeWidth={2.5} /> },
+    { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), color: 'blue', icon: <School size={15} strokeWidth={2.5} /> },
+    { key: 'attendance', label: 'Attendance Rate', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
+    { key: 'neet_qualified', label: 'NEET Qualified', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_qualified) || 0), color: 'purple', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
+    { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks || 0, color: 'amber', icon: <Layers size={15} strokeWidth={2.5} /> },
+    { key: 'teachers_staffed', label: 'Teachers Staffed', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.teachers_staffed) || 0), color: 'teal', icon: <Users size={15} strokeWidth={2.5} /> },
+    { key: 'electricity', label: 'Grid Connected', value: `${Number(metrics?.electricity) || 0}%`, color: 'yellow', icon: <Zap size={15} strokeWidth={2.5} /> },
+    { key: 'hi_tech_labs', label: 'Lab Facilities', value: `${Number(metrics?.hi_tech_labs) || 0}%`, color: 'rose', icon: <FlaskConical size={15} strokeWidth={2.5} /> },
+    { key: 'wash_audited', label: 'WASH Audited', value: `${Number(metrics?.wash_audited) || 0}%`, color: 'indigo', icon: <Droplet size={15} strokeWidth={2.5} /> },
   ];
 
   return (
     <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#f8fafc] border-l border-slate-200 h-full overflow-y-auto z-20">
       
       {/* ── Header ── */}
-      <div className="sticky top-0 z-10 pt-6 px-6 pb-4 bg-[#f8fafc]/90 backdrop-blur-md border-b border-slate-200 flex flex-col gap-1">
+      <div className="sticky top-0 z-10 pt-5 px-5 pb-4 bg-[#f8fafc]/90 backdrop-blur-md border-b border-slate-200 flex flex-col gap-1">
         <div className="flex items-center justify-between w-full">
           <span className="text-[10px] font-extrabold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
@@ -70,14 +70,14 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
             <X size={16} strokeWidth={2.5} />
           </button>
         </div>
-        <h2 className="text-[24px] font-black text-slate-900 tracking-tight truncate mt-1.5">
+        <h2 className="text-[22px] font-black text-slate-900 tracking-tight truncate mt-1.5">
           {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
         </h2>
       </div>
 
-      {/* ── Premium Grid Layout ── */}
-      <div className="p-5">
-        <div className="grid grid-cols-2 gap-3.5">
+      {/* ── Compact Premium Grid ── */}
+      <div className="p-4">
+        <div className="grid grid-cols-2 gap-3">
           {kpiCards.map(card => {
             const isActive = selectedMetric === card.key;
             const accent = getMetricColor(card.color);
@@ -86,10 +86,10 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                 key={card.key}
                 onClick={() => setMetric(card.key as any)}
                 className={`
-                  relative flex flex-col justify-between bg-white rounded-2xl p-4 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between bg-white rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
                   ${isActive 
-                    ? 'ring-2 shadow-lg border-transparent transform -translate-y-1' 
-                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-1'
+                    ? 'ring-1 shadow-md border-transparent transform -translate-y-0.5' 
+                    : 'border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
@@ -102,9 +102,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                 )}
 
                 <div className="flex flex-col h-full relative z-10 w-full">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between w-full mb-1.5">
                     <div 
-                      className="p-2 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
+                      className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
                       style={{ 
                         backgroundColor: isActive ? accent : '#f1f5f9', 
                         color: isActive ? '#ffffff' : '#64748b' 
@@ -112,16 +112,14 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                     >
                       {card.icon}
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col mt-auto w-full">
-                    <span className={`text-[26px] font-black tracking-tight leading-none mb-1.5 ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
+                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? '' : 'text-slate-800'}`} style={{ color: isActive ? accent : undefined }}>
                       {card.value}
                     </span>
-                    <span className={`text-[10.5px] font-bold uppercase tracking-wider ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
-                      {card.label}
-                    </span>
                   </div>
+                  
+                  <span className={`text-[10px] font-extrabold uppercase tracking-wider mt-1 line-clamp-1 ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
+                    {card.label}
+                  </span>
                 </div>
               </button>
             );
