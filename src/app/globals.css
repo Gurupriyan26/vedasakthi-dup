@@ -3,16 +3,16 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #020617; /* slate-950 */
-  --surface: #0f172a; /* slate-900 */
-  --surface-2: #1e293b; /* slate-800 */
+  --bg: #f4f7f6;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
   
-  --text-main: #f8fafc; /* slate-50 */
-  --text-sub: #cbd5e1; /* slate-300 */
-  --text-muted: #94a3b8; /* slate-400 */
+  --text-main: #2c3e50;
+  --text-sub: #7f8c8d;
+  --text-muted: #94a3b8;
   
-  --border: #1e293b; /* slate-800 */
-  --border-light: #334155; /* slate-700 */
+  --border: #e0e6ed;
+  --border-light: #e2e8f0;
 }
 
 body {
@@ -37,11 +37,11 @@ body {
   position: relative;
 }
 
-/* Scrollbars - Ultra Dark */
+/* Scrollbars - Light */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Animations */
 @keyframes dotPulse {
@@ -56,4 +56,4 @@ body {
 .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 .animate-slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.leaflet-container { background: #020617 !important; font-family: 'Inter', sans-serif; }
+.leaflet-container { background: #f4f7f6 !important; font-family: 'Inter', sans-serif; }

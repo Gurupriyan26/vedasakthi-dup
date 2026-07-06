@@ -12,7 +12,7 @@ import { RefreshCw } from 'lucide-react';
 const DistrictMap = dynamic(() => import('./components/DistrictMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: '#0d1520' }}>
+    <div className="w-full h-full flex items-center justify-center" style={{ background: '#ffffff' }}>
       <div className="text-center">
         <div className="w-12 h-12 rounded-full border-4 mx-auto mb-4" style={{ borderColor: '#3b82f6', borderTopColor: 'transparent', animation: 'spin 0.9s linear infinite' }} />
         <p className="text-sm font-semibold" style={{ color: '#475569' }}>Rendering map…</p>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
                   <span className="text-3xl">⚠️</span>
                 </div>
-                <h2 className="text-lg font-bold mb-2" style={{ color: '#f1f5f9' }}>Connection failed</h2>
+                <h2 className="text-lg font-bold mb-2" style={{ color: '#1e293b' }}>Connection failed</h2>
                 <p className="text-sm mb-5" style={{ color: '#64748b', lineHeight: 1.6 }}>{error}</p>
                 <button
                   onClick={retry}

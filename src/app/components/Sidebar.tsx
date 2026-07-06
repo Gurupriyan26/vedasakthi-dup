@@ -40,34 +40,29 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       style={{ 
         width: '340px', 
         zIndex: 10, 
-        background: '#020617', // slate-950
-        borderRight: '1px solid #1e293b',
+        background: '#f4f7f6', // matches light bg
+        borderRight: '1px solid #e2e8f0',
       }}
     >
       <div className="p-4">
-        {/* Stunning Dark Mode Hero Banner */}
+        {/* Clean Light Mode Hero Banner */}
         <div 
-          className="relative rounded-2xl overflow-hidden p-6 mb-6 group shadow-2xl border border-white/5"
-          style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%)',
-          }}
+          className="relative rounded-2xl overflow-hidden p-5 mb-6 group shadow-sm border border-slate-200"
+          style={{ background: '#ffffff' }}
         >
-          {/* Glassmorphism overlays */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full pointer-events-none" />
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-blue-500/0 via-blue-400/50 to-blue-500/0" />
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-100/50 blur-3xl rounded-full pointer-events-none" />
           
           <div className="relative z-10">
-            <div className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-2 flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#34d399]" />
               State Overview
             </div>
-            <div className="text-[30px] font-black leading-none text-white tracking-tight drop-shadow-md mb-2">
+            <div className="text-[28px] font-black leading-none text-slate-800 tracking-tight mb-2">
               Tamil Nadu
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/50 border border-indigo-500/30 backdrop-blur-md mt-1">
-              <Activity size={12} className="text-indigo-400" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-200">Live Analytics</span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100 mt-1">
+              <Activity size={12} className="text-indigo-600" />
+              <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-700">Live Analytics</span>
             </div>
           </div>
         </div>
@@ -76,7 +71,7 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
           <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">
             Command Metrics
           </div>
-          <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">State Avg</div>
+          <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">State Avg</div>
         </div>
 
         {/* Highly Attractive Metric Cards Stack */}
@@ -89,9 +84,9 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 onClick={() => setMetric(m.key)}
                 className="group flex items-center justify-between rounded-xl p-3.5 transition-all duration-300 relative overflow-hidden"
                 style={{
-                  background: isActive ? '#0f172a' : '#0a0f1c',
-                  border: `1px solid ${isActive ? m.accent : '#1e293b'}`,
-                  boxShadow: isActive ? `0 8px 25px ${m.accent}20` : '0 2px 4px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: `1px solid ${isActive ? m.accent : '#e2e8f0'}`,
+                  boxShadow: isActive ? `0 4px 15px ${m.accent}20` : '0 1px 3px rgba(0,0,0,0.05)',
                   transform: isActive ? 'scale(1.02) translateY(-2px)' : 'scale(1) translateY(0)',
                   animation: `slideFadeIn 0.3s ease-out forwards ${i * 0.04}s`,
                   opacity: 0,
@@ -99,49 +94,51 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 onMouseEnter={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.3)';
-                    e.currentTarget.style.borderColor = '#334155';
-                    e.currentTarget.style.background = '#0f172a';
+                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.05)';
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                    e.currentTarget.style.background = '#f8fafc';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                    e.currentTarget.style.borderColor = '#1e293b';
-                    e.currentTarget.style.background = '#0a0f1c';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                    e.currentTarget.style.background = '#ffffff';
                   }
                 }}
               >
-                {/* Subtle active background glow tint */}
+                {/* Accent Side Border */}
+                <div className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300" style={{ background: isActive ? m.accent : 'transparent' }} />
+                
                 {isActive && (
-                  <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ background: m.accent }} />
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ background: m.accent }} />
                 )}
                 
-                <div className="flex items-center gap-3.5 relative z-10">
+                <div className="flex items-center gap-3.5 relative z-10 ml-1">
                   <div 
-                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-inner"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm"
                     style={{ 
-                      background: isActive ? `${m.accent}20` : '#1e293b', 
-                      color: isActive ? m.accent : '#94a3b8',
-                      border: `1px solid ${isActive ? m.accent+'40' : '#334155'}`
+                      background: isActive ? `${m.accent}15` : '#f1f5f9', 
+                      color: isActive ? m.accent : '#64748b',
+                      border: `1px solid ${isActive ? m.accent+'40' : '#e2e8f0'}`
                     }}
                   >
                     {m.icon}
                   </div>
                   <div className="flex flex-col items-start">
-                    <div className="text-[11px] font-black uppercase tracking-wider mb-0.5 transition-colors" style={{ color: isActive ? '#f8fafc' : '#94a3b8' }}>
+                    <div className="text-[11px] font-black uppercase tracking-wider mb-0.5 transition-colors" style={{ color: isActive ? '#334155' : '#64748b' }}>
                       {m.label}
                     </div>
-                    {/* Trend indicator for a very "live data" feel */}
-                    <div className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: `${m.accent}15`, color: m.accent }}>
+                    {/* Trend indicator */}
+                    <div className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: isActive ? `${m.accent}15` : '#f1f5f9', color: isActive ? m.accent : '#64748b' }}>
                       <TrendingUp size={10} strokeWidth={3} />
                       {m.trend}
                     </div>
                   </div>
                 </div>
                 
-                <div className="relative z-10 text-[18px] font-black transition-colors text-right" style={{ color: isActive ? m.accent : '#f8fafc' }}>
+                <div className="relative z-10 text-[18px] font-black transition-colors text-right" style={{ color: isActive ? m.accent : '#1e293b' }}>
                   {overallStats[m.key]}
                 </div>
               </button>
@@ -153,8 +150,8 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         @keyframes slideFadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }

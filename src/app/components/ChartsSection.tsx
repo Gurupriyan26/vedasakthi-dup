@@ -13,7 +13,7 @@ const PALETTE = {
   good:      '#10B981',
   average:   '#F59E0B',
   attention: '#EF4444',
-  nodata:    '#1e293b',
+  nodata:    '#e2e8f0',
 };
 
 function getMetricColor(metric: MetricType, value?: number): string {
@@ -63,7 +63,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
     <div className="w-full">
       <div className="w-full text-left">
         {/* Table Header */}
-        <div className="flex items-center border-b border-slate-800 pb-2 mb-2">
+        <div className="flex items-center border-b border-slate-200 pb-2 mb-2">
           <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-12 text-center">Rank</div>
           <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex-1 ml-2">District Name</div>
           <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 w-24 text-right pr-2">Metric</div>
@@ -76,7 +76,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
             return (
               <div 
                 key={d.name} 
-                className="flex items-center p-1.5 rounded-lg hover:bg-slate-800/60 transition-colors border border-transparent hover:border-slate-700/50"
+                className="flex items-center p-1.5 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200"
               >
                 <div className="w-12 flex justify-center">
                   <div
@@ -93,13 +93,13 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                 </div>
                 
                 <div className="flex-1 ml-2">
-                  <div className="text-[12px] font-bold text-slate-200">
+                  <div className="text-[12px] font-bold text-slate-800">
                     {d.fullName}
                   </div>
                 </div>
                 
                 <div className="w-28 flex items-center justify-end gap-2 pr-1">
-                  <div className="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden xl:block">
+                  <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden hidden xl:block">
                     <div 
                       className="h-full rounded-full transition-all duration-700" 
                       style={{ width: `${barWidth}%`, background: isTop ? '#10B981' : '#EF4444' }} 
@@ -118,10 +118,10 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   );
 
   return (
-    <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#020617]">
+    <div className="flex flex-col xl:flex-row gap-5 p-5 bg-[#f4f7f6]">
       {/* ── Top/Bottom Data Tables ── */}
       <div className="flex flex-col gap-5 xl:w-[380px] flex-shrink-0">
-        <div className="rounded-xl p-5 bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+        <div className="rounded-xl p-5 bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
           {/* Subtle glow background */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
           
@@ -134,7 +134,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
           </div>
         </div>
 
-        <div className="rounded-xl p-5 bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+        <div className="rounded-xl p-5 bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
           {/* Subtle glow background */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -149,7 +149,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
       </div>
 
       {/* ── Bar Chart ── */}
-      <div className="flex-1 rounded-xl p-5 min-h-[300px] bg-[#0f172a] border border-[#1e293b] shadow-xl relative overflow-hidden">
+      <div className="flex-1 rounded-xl p-5 min-h-[300px] bg-[#ffffff] border border-slate-200 shadow-sm relative overflow-hidden">
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         
@@ -159,10 +159,10 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
         <div className="relative z-10 w-full h-[320px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
-                axisLine={{ stroke: '#334155' }}
+                axisLine={{ stroke: '#cbd5e1' }}
                 tickLine={false}
                 tick={false}
               />
@@ -172,18 +172,18 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                 tick={{ fontSize: 11, fill: '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
               />
               <Tooltip
-                cursor={{ fill: '#1e293b' }}
+                cursor={{ fill: '#f8fafc' }}
                 contentStyle={{
-                  background: '#020617',
+                  background: '#ffffff',
                   borderRadius: '12px',
-                  border: '1px solid #1e293b',
+                  border: '1px solid #e2e8f0',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '12px',
-                  color: '#f8fafc',
+                  color: '#1e293b',
                   padding: '14px',
-                  boxShadow: '0 20px 40px -10px rgba(0,0,0,0.5)'
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
                 }}
-                itemStyle={{ color: '#f8fafc', fontWeight: 900 }}
+                itemStyle={{ color: '#1e293b', fontWeight: 900 }}
                 labelStyle={{ color: '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
                 formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
               />
