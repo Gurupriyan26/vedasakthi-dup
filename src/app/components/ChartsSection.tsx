@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { District, DistrictMetrics } from '@/types';
 import { useDashboardStore, MetricType } from '@/store/useDashboardStore';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 
 interface ChartsSectionProps {
   districts: District[];
@@ -48,6 +48,12 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
       .sort((a, b) => b.value - a.value);
   }, [districts, selectedMetric]);
 
+  const averageValue = useMemo(() => {
+    if (chartData.length === 0) return 0;
+    const sum = chartData.reduce((acc, curr) => acc + curr.value, 0);
+    return sum / chartData.length;
+  }, [chartData]);
+
   if (chartData.length === 0) return null;
 
   const label = selectedMetric.replace(/_/g, ' ').toUpperCase();
@@ -64,16 +70,38 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
         <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[220px]">
+        <div className="relative z-10 w-full h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 65 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
                 axisLine={{ stroke: '#cbd5e1' }}
                 tickLine={false}
-                tick={false}
-                height={10}
+                tick={{ 
+                  fontSize: 9, 
+                  fill: '#94a3b8', 
+                  fontFamily: 'Inter, sans-serif', 
+                  fontWeight: 700, 
+                  angle: -45, 
+                  textAnchor: 'end',
+                  dy: 10 
+                }}
+                interval={0}
+              />
+              <ReferenceLine 
+                y={averageValue} 
+                stroke="#6366f1" 
+                strokeDasharray="4 4" 
+                strokeWidth={2}
+                label={{ 
+                  position: 'top', 
+                  value: `STATE AVG: ${fmt(Math.round(averageValue))}`, 
+                  fill: '#6366f1', 
+                  fontSize: 10, 
+                  fontWeight: 900,
+                  fontFamily: 'Inter, sans-serif'
+                }} 
               />
               <YAxis
                 axisLine={false}
