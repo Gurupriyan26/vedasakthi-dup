@@ -55,7 +55,7 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
           </div>
           <div>
             <h2 className="text-[13px] font-black text-white uppercase tracking-widest leading-tight">TN Education</h2>
-            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Analytics Engine</p>
+            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dashboard Prototype</p>
           </div>
         </div>
 

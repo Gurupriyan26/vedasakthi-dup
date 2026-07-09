@@ -93,10 +93,9 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
         )}
         <div className="flex items-center gap-2.5 text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded-full bg-slate-900 text-white shadow-md border border-slate-800 hover:bg-slate-800 transition-colors cursor-default">
           <div className="relative flex items-center justify-center w-2 h-2">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
           </div>
-          System Live
+          Preview Mode
         </div>
       </div>
     </header>
