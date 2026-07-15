@@ -26,8 +26,8 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
         <div className="flex flex-col justify-center">
           <h1 className="m-0 text-[19px] font-black text-slate-900 tracking-tight leading-none flex items-center gap-2">
             Vedasakthi
-            <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-1.5 py-0.5 rounded-[4px] text-[8px] uppercase tracking-widest font-black shadow-sm">
-              PRO
+            <span className="bg-slate-100 text-slate-500 border border-slate-200/80 px-1.5 py-0.5 rounded-[4px] text-[8px] uppercase tracking-widest font-bold shadow-sm">
+              PREVIEW
             </span>
           </h1>
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1.5">
@@ -91,9 +91,9 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
             Syncing...
           </div>
         )}
-        <div className="flex items-center gap-2.5 text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded-full bg-slate-900 text-white shadow-md border border-slate-800 hover:bg-slate-800 transition-colors cursor-default">
+        <div className="flex items-center gap-2.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200/60 transition-colors cursor-default shadow-sm">
           <div className="relative flex items-center justify-center w-2 h-2">
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
           </div>
           Preview Mode
         </div>

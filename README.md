@@ -73,10 +73,15 @@ The dashboard is currently running in **Preview Mode** — the structure, map, a
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
    ```
 
-3. **Set up the database** — run the SQL file in Supabase SQL Editor:
-   ```
-   supabase/migrations/20260630000000_create_district_table.sql
-   ```
+3. **Set up the database** — run the SQL files in your Supabase SQL Editor:
+   * **First**, create the districts table and populate it:
+     ```
+     supabase/migrations/20260630000000_create_district_table.sql
+     ```
+   * **Second**, create the metrics table and insert the seed metrics data:
+     ```
+     supabase/district_metrics.sql
+     ```
 
 4. **Start the app**
    ```bash
@@ -90,11 +95,11 @@ The dashboard is currently running in **Preview Mode** — the structure, map, a
 
 The database is designed so that updating district figures requires **no code change at all**.
 
-Simply run an `UPDATE` in the Supabase SQL Editor:
+Simply run an `UPDATE` statement in the Supabase SQL Editor:
 ```sql
 UPDATE district_metrics
-SET attendance = 91, neet_qualified = 450
-WHERE district_id = (SELECT id FROM district WHERE district_name = 'Chennai');
+SET attendance = 94.50, neet_qualified = 1450
+WHERE district_id = (SELECT id FROM districts WHERE district_name = 'Chennai');
 ```
 
 ---
