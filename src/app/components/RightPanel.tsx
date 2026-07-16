@@ -268,73 +268,155 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
         {/* ══════════════════════════════════════════
             VETRI PALLIGAL COACHING CENTRES
         ══════════════════════════════════════════ */}
-        <div className={`flex flex-col transition-all duration-300 ${dk ? 'bg-[#080d15]/40' : 'bg-slate-50/70'}`}>
-          {/* Collapsible header */}
-          <button
-            onClick={() => setSchoolsExpanded(p => !p)}
-            className={`flex items-center justify-between px-5 py-3.5 w-full cursor-pointer transition-colors ${dk ? 'hover:bg-[#1e293b]/40' : 'hover:bg-slate-100/80'}`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="p-1 rounded-md bg-purple-500/15 text-purple-400">
-                <GraduationCap size={13} />
-              </div>
-              <span className={`text-[10px] font-extrabold uppercase tracking-widest ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
-                Coaching Centres
-              </span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black"
-                style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7' }}>
-                {schoolsLoading ? '…' : schools.length}
-              </span>
-            </div>
-            <div className={`p-1 rounded-md transition-all duration-300 ${schoolsExpanded ? 'rotate-90' : ''} ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
-              <ChevronRight size={14} />
-            </div>
-          </button>
+        <div className="flex flex-col">
 
-          {/* School list */}
+          {/* ── Section Banner ── */}
+          <div className={`relative overflow-hidden mx-4 mt-4 mb-3 rounded-2xl p-4 border ${
+            dk ? 'border-purple-500/20 bg-gradient-to-br from-purple-900/30 via-[#1a0f2e]/60 to-indigo-900/20' 
+               : 'border-purple-200/60 bg-gradient-to-br from-purple-50 via-white to-indigo-50'
+          }`}>
+            {/* Decorative blurred orb */}
+            <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-30 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, #a855f7, transparent)' }} />
+
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-6 h-6 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <GraduationCap size={13} className="text-purple-400" />
+                  </div>
+                  <span className={`text-[9px] font-extrabold uppercase tracking-widest ${dk ? 'text-purple-300' : 'text-purple-600'}`}>
+                    Vetri Palligal
+                  </span>
+                </div>
+                <div className={`text-[22px] font-black leading-none ${dk ? 'text-white' : 'text-slate-900'}`}>
+                  {schoolsLoading ? '…' : schools.length}
+                </div>
+                <div className={`text-[10px] font-semibold mt-0.5 ${dk ? 'text-purple-300/70' : 'text-purple-500'}`}>
+                  Coaching Centres
+                </div>
+              </div>
+              <button
+                onClick={() => setSchoolsExpanded(p => !p)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border cursor-pointer transition-all duration-200 ${
+                  schoolsExpanded
+                    ? dk ? 'bg-purple-500/20 border-purple-500/30 text-purple-300' : 'bg-purple-100 border-purple-300 text-purple-700'
+                    : dk ? 'bg-[#1e293b] border-slate-700 text-slate-400 hover:border-purple-500/30 hover:text-purple-300' : 'bg-white border-slate-200 text-slate-500 hover:border-purple-300 hover:text-purple-600'
+                }`}
+              >
+                <ChevronRight size={11} className={`transition-transform duration-300 ${schoolsExpanded ? 'rotate-90' : ''}`} />
+                {schoolsExpanded ? 'Collapse' : 'Expand'}
+              </button>
+            </div>
+          </div>
+
+          {/* ── School Cards ── */}
           {schoolsExpanded && (
-            <div className="px-4 pb-4">
+            <div className="px-4 pb-6">
               {schoolsLoading ? (
-                <div className="flex flex-col gap-2">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className={`h-12 rounded-xl animate-pulse ${dk ? 'bg-[#1e293b]/50' : 'bg-slate-200/60'}`} />
+                <div className="flex flex-col gap-3">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className={`h-[70px] rounded-2xl animate-pulse ${dk ? 'bg-[#1e293b]/60' : 'bg-slate-100'}`} />
                   ))}
                 </div>
               ) : schools.length > 0 ? (
-                <div className="flex flex-col gap-1.5">
-                  {schools.map((school, idx) => (
-                    <div key={school.id}
-                      className={`group flex items-start gap-3 px-3 py-2.5 rounded-xl border transition-all duration-200 cursor-default ${
-                        dk
-                          ? 'bg-[#1e293b]/30 border-slate-800/50 hover:bg-[#1e293b]/60 hover:border-slate-700/60'
-                          : 'bg-white border-slate-200/70 hover:border-slate-300 hover:shadow-sm'
-                      }`}>
-                      {/* Index badge */}
-                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5 ${dk ? 'bg-purple-500/15 text-purple-400' : 'bg-purple-50 text-purple-600 border border-purple-100'}`}>
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[11px] font-semibold leading-tight truncate transition-colors ${dk ? 'text-slate-200 group-hover:text-white' : 'text-slate-700 group-hover:text-slate-900'}`}>
-                          {school.school_name}
-                        </p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <MapPin size={8} className={dk ? 'text-slate-600' : 'text-slate-400'} />
-                          <span className={`text-[9px] font-medium uppercase tracking-wide ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
-                            {school.block_name}
-                          </span>
+                <div className="flex flex-col gap-2.5">
+                  {schools.map((school, idx) => {
+                    /* Cycle through accent colours per card for variety */
+                    const hues = ['#6366f1','#a855f7','#ec4899','#14b8a6','#3b82f6','#f59e0b'];
+                    const glow = hues[idx % hues.length];
+                    return (
+                      <div
+                        key={school.id}
+                        className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-default ${
+                          dk
+                            ? 'bg-gradient-to-r from-[#1e293b]/70 to-[#1e293b]/40 border-slate-800/50 hover:border-slate-600/60'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-md'
+                        }`}
+                        style={{
+                          boxShadow: dk ? `0 0 0 0 ${glow}` : undefined,
+                        }}
+                        onMouseEnter={e => {
+                          if (dk) (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${glow}22, inset 0 0 0 1px ${glow}30`;
+                        }}
+                        onMouseLeave={e => {
+                          if (dk) (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 0 ${glow}`;
+                        }}
+                      >
+                        {/* Left accent bar */}
+                        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full opacity-70"
+                          style={{ background: glow }} />
+
+                        {/* Subtle top-right shimmer on hover */}
+                        <div className="absolute top-0 right-0 w-20 h-20 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
+                          style={{ background: glow }} />
+
+                        <div className="flex items-center gap-3 px-4 py-3 pl-5">
+                          {/* Index badge with glow */}
+                          <div
+                            className="w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+                            style={{
+                              background: `${glow}22`,
+                              color: glow,
+                              border: `1px solid ${glow}40`,
+                              boxShadow: `0 2px 8px ${glow}20`,
+                            }}
+                          >
+                            {idx + 1}
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[12px] font-bold leading-tight transition-colors duration-200 ${
+                              dk ? 'text-slate-200 group-hover:text-white' : 'text-slate-800 group-hover:text-slate-950'
+                            }`}>
+                              {school.school_name}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md"
+                                style={{ background: `${glow}15`, border: `1px solid ${glow}25` }}>
+                                <MapPin size={8} style={{ color: glow }} />
+                                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: glow }}>
+                                  {school.block_name}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Subtle school icon on the right */}
+                          <School
+                            size={16}
+                            className="flex-shrink-0 transition-all duration-300 opacity-20 group-hover:opacity-50"
+                            style={{ color: glow }}
+                          />
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+
+                  {/* Bottom summary pill */}
+                  <div className={`mt-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed text-[10px] font-bold uppercase tracking-widest ${
+                    dk ? 'border-slate-800/60 text-slate-600' : 'border-slate-200 text-slate-400'
+                  }`}>
+                    <GraduationCap size={12} className="text-purple-400 opacity-60" />
+                    {schools.length} Vetri Palligal {schools.length === 1 ? 'Centre' : 'Centres'}
+                  </div>
                 </div>
               ) : (
-                <div className={`flex flex-col items-center justify-center py-8 rounded-2xl border border-dashed text-center ${dk ? 'bg-[#1e293b]/20 border-slate-800/50' : 'bg-white border-slate-200'}`}>
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${dk ? 'bg-slate-800 text-slate-500' : 'bg-slate-50 text-slate-350 border border-slate-200'}`}>
-                    <Wifi size={20} strokeWidth={1.5} />
+                <div className={`relative overflow-hidden flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed text-center ${
+                  dk ? 'bg-[#1e293b]/20 border-slate-800/50' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none rounded-2xl" />
+                  <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
+                    dk ? 'bg-[#1e293b] border border-slate-800' : 'bg-purple-50 border border-purple-100'
+                  }`}>
+                    <GraduationCap size={24} strokeWidth={1.5} className={dk ? 'text-slate-600' : 'text-purple-300'} />
                   </div>
-                  <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>No Centres Registered</p>
-                  <p className={`text-[10px] leading-relaxed max-w-[170px] ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
-                    No Vetri Palligal coaching centres listed for this district.
+                  <p className={`text-[11px] font-black uppercase tracking-widest mb-1.5 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
+                    No Centres Listed
+                  </p>
+                  <p className={`text-[10px] leading-relaxed max-w-[180px] ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
+                    No Vetri Palligal coaching centres have been registered for this district yet.
                   </p>
                 </div>
               )}
@@ -345,3 +427,4 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
     </aside>
   );
 }
+
