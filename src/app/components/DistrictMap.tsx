@@ -254,7 +254,10 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
 
       {/* Host Required Performance Legend */}
       {selectedMetric !== 'general' && (
-        <div className="absolute bottom-6 right-6 z-[1000] bg-white/95 backdrop-blur-xl rounded-xl p-4 border border-slate-200 shadow-md flex flex-col gap-2.5">
+        <div className="absolute bottom-20 right-6 z-[1000] bg-[#0f172a]/85 backdrop-blur-md rounded-2xl p-4 border border-[#1e293b] shadow-2xl flex flex-col gap-3">
+          <div className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 border-b border-[#1e293b]/80 pb-1.5 mb-0.5">
+            Performance Index
+          </div>
           {[
             { color: PALETTE.good,      label: 'High Performance' },
             { color: PALETTE.average,   label: 'Average' },
@@ -262,10 +265,10 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
           ].map(({ color, label }) => (
             <div key={label} className="flex items-center gap-3 group cursor-default">
               <div 
-                className="w-3.5 h-3.5 rounded-[3px]"
+                className="w-3 h-3 rounded-full"
                 style={{ background: color, boxShadow: `0 0 8px ${color}80` }}
               />
-              <span className="text-[12px] font-bold text-slate-700">{label}</span>
+              <span className="text-[11px] font-bold text-slate-300 transition-colors group-hover:text-white">{label}</span>
             </div>
           ))}
         </div>

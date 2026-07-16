@@ -117,9 +117,9 @@ export default function DashboardPage() {
               {!showCharts && !loading && filteredDistricts.length > 0 && (
                 <button
                   onClick={() => setShowCharts(true)}
-                  className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-5 py-2.5 bg-slate-900/95 hover:bg-slate-800 text-white text-[11px] font-black uppercase tracking-wider rounded-full border border-slate-700 shadow-2xl transition-all duration-300 flex items-center gap-2"
+                  className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-6 py-3 bg-[#0f172a]/85 hover:bg-[#0f172a] text-white text-[11px] font-extrabold uppercase tracking-widest rounded-full border border-indigo-500/30 shadow-[0_8px_30px_rgba(0,0,0,0.35)] hover:shadow-[0_0_20px_rgba(99,102,241,0.45)] hover:border-indigo-400/60 transition-all duration-300 flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 group"
                 >
-                  <BarChart2 size={13} className="text-indigo-400" />
+                  <BarChart2 size={13} className="text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
                   Show Distribution Chart
                 </button>
               )}
