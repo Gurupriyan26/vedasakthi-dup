@@ -33,6 +33,23 @@ const PALETTE = {
   nodata:    '#e2e8f0', // slate-200
 };
 
+const METRIC_LABELS: Record<MetricType, string> = {
+  general: 'General',
+  infra_status: 'Infrastructure Status',
+  total_schools: 'Total Schools',
+  attendance: 'Attendance',
+  neet_qualified: 'NEET Qualified',
+  coaching_schools: 'NEET/JEE Coaching Schools',
+  neet_coaching_enrolment_est: 'NEET Enrolment (est.)',
+  jee_coaching_enrolment_est: 'JEE Enrolment (est.)',
+  total_coaching_enrolment_est: 'Total Enrolment (est.)',
+  hi_tech_labs: 'Active Labs',
+  teachers_staffed: 'Teachers Staffed',
+  electricity: 'Grid Connect',
+  wash_audited: 'Sanitation',
+  active_blocks: 'Active Blocks',
+};
+
 function getGeneralColor(id: number): string {
   const colors = [
     '#3b82f6', // blue
@@ -61,6 +78,10 @@ function getMetricColor(metric: MetricType, value?: number, districtId?: number)
     case 'wash_audited':     return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
     case 'total_schools':    return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
     case 'neet_qualified':   return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
+    case 'coaching_schools': return value >= 12 ? PALETTE.good : value >= 6 ? PALETTE.average : PALETTE.attention;
+    case 'neet_coaching_enrolment_est': return value >= 960 ? PALETTE.good : value >= 480 ? PALETTE.average : PALETTE.attention;
+    case 'jee_coaching_enrolment_est': return value >= 960 ? PALETTE.good : value >= 480 ? PALETTE.average : PALETTE.attention;
+    case 'total_coaching_enrolment_est': return value >= 1920 ? PALETTE.good : value >= 960 ? PALETTE.average : PALETTE.attention;
     case 'active_blocks':    return value >= 10 ? PALETTE.good : value >= 5 ? PALETTE.average : PALETTE.attention;
     default: return PALETTE.nodata;
   }
@@ -146,19 +167,26 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
 
     layer.bindTooltip(
       `<div style="font-family:Inter,sans-serif;padding:12px;min-width:160px;background:#ffffff;border-radius:8px;border:1px solid #e2e8f0;box-shadow:0 4px 15px rgba(0,0,0,0.05)">
-        <div style="font-size:9px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${selectedMetric.replace(/_/g,' ')}</div>
+        <div style="font-size:9px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${METRIC_LABELS[selectedMetric] || selectedMetric.replace(/_/g,' ')}</div>
         <div style="font-size:15px;font-weight:900;color:#1e293b;margin-bottom:8px">${resolvedName}</div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;"></div>
           <span style="font-size:18px;font-weight:900;color:#1e293b;letter-spacing:-0.03em">${displayValue}</span>
         </div>
       </div>`,
-      { sticky: true, direction: 'top', className: 'leaflet-tooltip-clean-dark', offset: [0, -6] }
+      { sticky: true, direction: 'top', className: 'leaflet-tooltip-clean-dark pointer-events-none', offset: [0, -6] }
     );
 
     const path = layer as L.Path;
     layer.on({
-      click: () => { if (district) onDistrictSelect(district); },
+      click: () => { 
+        console.log('Map district clicked:', resolvedName, 'DB District object:', district);
+        if (district) {
+          onDistrictSelect(district); 
+        } else {
+          console.warn('Click registered but DB district object was not found for resolved name:', resolvedName);
+        }
+      },
       mouseover: () => {
         path.setStyle({ weight: 2.5, fillOpacity: 1, color: '#333333' });
         path.bringToFront();
@@ -170,7 +198,7 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
   return (
     <div className="relative w-full h-full bg-[#f4f7f6]">
       <style dangerouslySetInnerHTML={{__html: `
-        .leaflet-tooltip-clean-dark { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+        .leaflet-tooltip-clean-dark { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; pointer-events: none !important; }
         .leaflet-tooltip-clean-dark::before { display: none !important; }
       `}} />
 
@@ -207,6 +235,18 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
             data={geoData}
             style={styleFeature as GeoJSONOptions['style']}
             onEachFeature={onEachFeature}
+            eventHandlers={{
+              click: (e) => {
+                const clickedLayer = e.layer;
+                if (clickedLayer && clickedLayer.feature) {
+                  const { resolvedName, district } = getDistrictFromFeature(clickedLayer.feature);
+                  console.log('Map layer clicked via eventHandlers:', resolvedName, district);
+                  if (district) {
+                    onDistrictSelect(district);
+                  }
+                }
+              }
+            }}
             ref={ref => { if (ref) geoJsonLayerRef.current = ref; }}
           />
         )}

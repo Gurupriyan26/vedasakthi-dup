@@ -16,6 +16,23 @@ const PALETTE = {
   nodata:    '#e2e8f0',
 };
 
+const METRIC_LABELS: Record<MetricType, string> = {
+  general: 'General',
+  infra_status: 'Infrastructure Status',
+  total_schools: 'Total Schools',
+  attendance: 'Attendance',
+  neet_qualified: 'NEET Qualified',
+  coaching_schools: 'NEET/JEE Coaching Schools',
+  neet_coaching_enrolment_est: 'NEET Enrolment (est.)',
+  jee_coaching_enrolment_est: 'JEE Enrolment (est.)',
+  total_coaching_enrolment_est: 'Total Enrolment (est.)',
+  hi_tech_labs: 'Active Labs',
+  teachers_staffed: 'Teachers Staffed',
+  electricity: 'Grid Connect',
+  wash_audited: 'Sanitation',
+  active_blocks: 'Active Blocks',
+};
+
 function getMetricColor(metric: MetricType, value?: number): string {
   if (value == null) return PALETTE.nodata;
 
@@ -27,6 +44,10 @@ function getMetricColor(metric: MetricType, value?: number): string {
     case 'wash_audited':     return value >= 85 ? PALETTE.good : value >= 70 ? PALETTE.average : PALETTE.attention;
     case 'total_schools':    return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
     case 'neet_qualified':   return value >= 800 ? PALETTE.good : value >= 400 ? PALETTE.average : PALETTE.attention;
+    case 'coaching_schools': return value >= 12 ? PALETTE.good : value >= 6 ? PALETTE.average : PALETTE.attention;
+    case 'neet_coaching_enrolment_est': return value >= 960 ? PALETTE.good : value >= 480 ? PALETTE.average : PALETTE.attention;
+    case 'jee_coaching_enrolment_est': return value >= 960 ? PALETTE.good : value >= 480 ? PALETTE.average : PALETTE.attention;
+    case 'total_coaching_enrolment_est': return value >= 1920 ? PALETTE.good : value >= 960 ? PALETTE.average : PALETTE.attention;
     case 'active_blocks':    return value >= 10 ? PALETTE.good : value >= 5 ? PALETTE.average : PALETTE.attention;
     default: return PALETTE.nodata;
   }
@@ -56,7 +77,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
 
   if (chartData.length === 0) return null;
 
-  const label = selectedMetric.replace(/_/g, ' ').toUpperCase();
+  const label = METRIC_LABELS[selectedMetric] || selectedMetric.replace(/_/g, ' ');
   const isPercent = PERCENT_METRICS.has(selectedMetric);
   const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
 

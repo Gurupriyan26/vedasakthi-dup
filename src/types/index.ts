@@ -14,7 +14,11 @@ export interface DistrictMetrics {
   district_id: number;
   total_schools: number;
   attendance: number;
-  neet_qualified: number;
+  neet_qualified: number; // Keep for compatibility
+  coaching_schools?: number;
+  neet_coaching_enrolment_est?: number;
+  jee_coaching_enrolment_est?: number;
+  total_coaching_enrolment_est?: number;
   hi_tech_labs: number;
   teachers_staffed: number;
   electricity: number;

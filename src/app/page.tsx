@@ -41,6 +41,13 @@ export default function DashboardPage() {
     return districts.filter(d => d.district_name.toLowerCase().includes(q));
   }, [districts, searchQuery]);
 
+  // Auto-select district when search filters down to exactly 1 district
+  useEffect(() => {
+    if (filteredDistricts.length === 1) {
+      setSelectedDistrictId(filteredDistricts[0].id);
+    }
+  }, [filteredDistricts]);
+
   // Skeleton loading shell
   if (!mounted) {
     return (
@@ -98,7 +105,7 @@ export default function DashboardPage() {
               {/* Map — fills the full height */}
               <div className="absolute inset-0 z-0">
                 <DistrictMap
-                  districts={filteredDistricts}
+                  districts={districts}
                   loading={loading}
                   onDistrictSelect={d => setSelectedDistrictId(d.id)}
                   selectedDistrictId={selectedDistrictId}
