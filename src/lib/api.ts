@@ -11,7 +11,7 @@ import { MOCK_DISTRICTS } from './mockData';
  */
 export async function fetchDistricts(): Promise<District[]> {
   try {
-    // Note: ensure your table is named `districts`, previous version queried `district`
+    // Query both general district metrics and the new Vetri Palligal district summary metrics
     const { data, error } = await supabase
       .from('districts')
       .select(`
@@ -20,7 +20,8 @@ export async function fetchDistricts(): Promise<District[]> {
         lgd_code, 
         source_id, 
         created_at,
-        metrics:district_metrics(*)
+        metrics:district_metrics(*),
+        vetri:vetri_district_metrics(*)
       `)
       .order('district_name', { ascending: true });
 
@@ -31,17 +32,52 @@ export async function fetchDistricts(): Promise<District[]> {
       throw new Error('No districts returned from database');
     }
     
-    // Supabase returns nested relations as arrays (even for 1-to-1 if not explicitly structured),
-    // or as a single object if the foreign key has a unique constraint.
-    // Our district_metrics has a UNIQUE(district_id), so it should be a single object,
-    // but just in case it returns an array we unwrap it.
-    return data.map(d => ({
-      ...d,
-      metrics: Array.isArray(d.metrics) ? d.metrics[0] : d.metrics
-    })) as District[];
+    // Merge general metrics and Vetri summary metrics
+    return data.map(d => {
+      const mainMetrics = Array.isArray(d.metrics) ? d.metrics[0] : d.metrics;
+      const vetriMetrics = Array.isArray(d.vetri) ? d.vetri[0] : d.vetri;
+      return {
+        ...d,
+        metrics: {
+          ...mainMetrics,
+          ...vetriMetrics
+        }
+      };
+    }) as District[];
     
   } catch (error) {
     console.warn('Failed to fetch districts from Supabase. Falling back to local mock data.', error);
     return MOCK_DISTRICTS;
+  }
+}
+
+// ─── Vetri Palligal Schools ──────────────────────────────────────────────────
+
+export interface VetriSchool {
+  id: number;
+  district_id: number;
+  block_name: string;
+  school_name: string;
+}
+
+/**
+ * Fetch detailed Vetri Palligal coaching schools list for a given district.
+ */
+export async function fetchVetriSchools(districtId: number): Promise<VetriSchool[]> {
+  try {
+    const { data, error } = await supabase
+      .from('vetri_schools')
+      .select('id, district_id, block_name, school_name')
+      .eq('district_id', districtId)
+      .order('block_name', { ascending: true })
+      .order('school_name', { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+    return (data || []) as VetriSchool[];
+  } catch (error) {
+    console.error(`Failed to fetch Vetri schools for district ${districtId}:`, error);
+    return [];
   }
 }

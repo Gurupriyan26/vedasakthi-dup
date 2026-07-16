@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { District } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
-import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Layers, Activity, X } from 'lucide-react';
+import { fetchVetriSchools, VetriSchool } from '@/lib/api';
+import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Layers, Activity, X, MapPin } from 'lucide-react';
 
 interface RightPanelProps {
   selectedDistrict: District | null;
@@ -24,6 +26,36 @@ const getMetricColor = (color: string) => {
 
 export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
   const { setMetric, selectedMetric } = useDashboardStore();
+  const [schools, setSchools] = useState<VetriSchool[]>([]);
+  const [schoolsLoading, setSchoolsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedDistrict) {
+      setSchools([]);
+      return;
+    }
+
+    let isMounted = true;
+    setSchoolsLoading(true);
+
+    fetchVetriSchools(selectedDistrict.id)
+      .then(data => {
+        if (isMounted) {
+          setSchools(data);
+          setSchoolsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSchools([]);
+          setSchoolsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedDistrict]);
 
   if (!selectedDistrict) {
     return (
@@ -45,9 +77,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
     { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), color: 'blue', icon: <School size={15} strokeWidth={2.5} /> },
     { key: 'attendance', label: 'Attendance', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
     { key: 'coaching_schools', label: 'NEET/JEE Coaching Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.coaching_schools) || 0), color: 'purple', icon: <School size={15} strokeWidth={2.5} /> },
-    { key: 'neet_coaching_enrolment_est', label: 'NEET Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_coaching_enrolment_est) || 0), color: 'indigo', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
-    { key: 'jee_coaching_enrolment_est', label: 'JEE Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.jee_coaching_enrolment_est) || 0), color: 'rose', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
-    { key: 'total_coaching_enrolment_est', label: 'Total Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_coaching_enrolment_est) || 0), color: 'teal', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
+    { key: 'neet_coaching_enrolment_est', label: 'NEET Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_coaching_enrolment_est) || 0), color: 'indigo', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
+    { key: 'jee_coaching_enrolment_est', label: 'JEE Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.jee_coaching_enrolment_est) || 0), color: 'rose', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
+    { key: 'total_coaching_enrolment_est', label: 'Total Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_coaching_enrolment_est) || 0), color: 'teal', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
     { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks || 0, color: 'amber', icon: <Layers size={15} strokeWidth={2.5} /> },
     { key: 'teachers_staffed', label: 'Teachers Staffed', value: `${Number(metrics?.teachers_staffed) || 0}%`, color: 'teal', icon: <Users size={15} strokeWidth={2.5} /> },
     { key: 'electricity', label: 'Grid Connected', value: `${Number(metrics?.electricity) || 0}%`, color: 'yellow', icon: <Zap size={15} strokeWidth={2.5} /> },
@@ -129,6 +161,61 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
           })}
         </div>
       </div>
+
+      {/* ── Vetri Palligal Coaching Centres list ── */}
+      {selectedDistrict && (
+        <div className="flex flex-col flex-1 border-t border-[#1e293b] mt-2 p-5 bg-[#0b0f19]/30 min-h-[250px]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-[0.15em] flex items-center gap-2">
+              <GraduationCap size={14} className="text-purple-400 animate-bounce" style={{ animationDuration: '3s' }} />
+              Coaching Centres ({schools.length})
+            </h3>
+            {schoolsLoading && (
+              <div className="w-3.5 h-3.5 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
+            )}
+          </div>
+
+          {schoolsLoading ? (
+            <div className="flex flex-col gap-2.5">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-[#1e293b]/40 rounded-xl p-3 animate-pulse h-14 border border-slate-800/40" />
+              ))}
+            </div>
+          ) : schools.length > 0 ? (
+            <div className="overflow-y-auto max-h-[320px] flex flex-col gap-2 pr-1 scrollbar-thin">
+              {schools.map(school => (
+                <div 
+                  key={school.id} 
+                  className="bg-[#1e293b]/40 border border-slate-800/60 rounded-xl p-3 flex flex-col gap-1 transition-all hover:bg-[#1e293b]/70 hover:border-slate-700/60 group"
+                >
+                  <div className="flex gap-2 items-start">
+                    <div className="p-1 rounded bg-[#0f172a] text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors mt-0.5">
+                      <School size={12} />
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-200 group-hover:text-white transition-colors leading-tight">
+                      {school.school_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 pl-6">
+                    <MapPin size={9} className="text-slate-500" />
+                    <span className="text-[9px] font-medium text-slate-400 uppercase tracking-wider">
+                      {school.block_name} Block
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-[#1e293b]/20 rounded-2xl border border-dashed border-slate-800/50">
+              <span className="text-2xl mb-2">🏫</span>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">No Centres Registered</p>
+              <p className="text-[9px] text-slate-400 mt-1 max-w-[200px] leading-relaxed">
+                There are no Vetri Palligal coaching centres listed for this district.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </aside>
   );
 }

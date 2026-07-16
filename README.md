@@ -3,60 +3,82 @@
 
 ---
 
+## Recent Updates & Changes Implemented
+
+Here is a summary of the database updates and UI modifications recently completed:
+
+1. **Integrated Genuine Sourced Data**:
+   * Replaced mock/placeholder metrics with **genuine government records** for Tamil Nadu's weekend NEET/JEE coaching centers ("Vetri Palligal").
+   * Loaded and mapped **364 confirmed schools** into the database.
+2. **Honest Labelling System**:
+   * Updated dashboard text state-wide, Leaflet map tooltips, and Recharts charts so that estimated enrolment metrics are clearly labeled as:
+     * `"NEET Coaching Enrolment (est.)"`
+     * `"JEE Coaching Enrolment (est.)"`
+     * `"Total Coaching Enrolment (est.)"`
+   * Kept plain labelling for the real school counts as `"NEET/JEE Coaching Schools"`.
+3. **Robust Database Mapping**:
+   * Resolved district name variations (e.g., matching `"VILLUPURAM"` to `"Viluppuram"`, `"THE NILGIRIS"` to `"Nilgiris"`, `"SIVAGANGAI"` to `"Sivaganga"`, and `"CHENNAI (EXT. GCC)"` to `"Chennai"`) using official LGD codes and district IDs to ensure clean data loading without silent failures.
+4. **Milestone 2 Interactive Drill-down**:
+   * Built a responsive drill-down interface: selecting any district on the map loads and lists the exact coaching schools in that district, categorized dynamically by **Block Name**.
+
+---
+
 ## What I Built
 
 An **interactive dashboard** that shows education data for all **38 districts of Tamil Nadu** on an interactive map.
 
-When you click any district on the map, it shows 8 key numbers for that district — like how many schools are there, how many teachers are working, and what percentage of schools have electricity, toilets, and computer labs.
+When you click any district on the map, it shows key numbers for that district — like how many schools are there, student attendance, NEET/JEE coaching centers, and infrastructure status (electricity, toilets, computer labs).
 
-Think of it as a **command view** — one screen where you can see the health of school education across the entire state at a glance.
+Additionally, clicking a district triggers a **detailed drill-down panel (Milestone 2)** showing the exact list of government weekend-coaching schools ("Vetri Palligal") active within that district, organized by Block > School.
 
 ---
 
 ## What You Can Do On the Dashboard
 
-- 🗺️ **Click any district** on the Tamil Nadu map to see its details
-- 📊 **See 8 key metrics** for each district instantly
-- 🔍 **Search** for a district by name using the top search bar
-- 📋 **View summary cards** at the top showing state-wide totals
+* 🗺️ **Click any district** on the Tamil Nadu map to render the metric heatmaps.
+* 📊 **View 11 key metrics** for each district instantly across Sidebar and Right Profile Panel.
+* 🔍 **Search** for a district using the top search bar (auto-selects when a search matches exactly 1 district).
+* 📋 **Interact with distribution charts** (Recharts) floating over the map to view state averages and compare district performance.
+* 🏫 **Drill down to school level** to view the genuine list of registered NEET/JEE weekend coaching centers for the selected district.
 
 ---
 
-## The 8 Metrics Tracked
+## Sourced Metrics vs. Estimates (Honest Labelling)
 
-| Metric | What It Means |
-|--------|--------------|
-| **Total Schools** | How many schools are in the district |
-| **Attendance** | What % of students attend school regularly |
-| **NEET Qualified** | How many students qualified the NEET exam |
-| **Hi-Tech Labs** | How many schools have computer/ICT labs |
-| **Teachers Staffed** | How many teachers are deployed |
-| **Grid Connect** | What % of schools have electricity |
-| **WASH Audited** | What % of schools have clean water & toilets |
-| **Active Blocks** | How many education blocks are active |
+To ensure maximum transparency for senior decision-makers, metrics on the dashboard are classified and labeled according to whether they are genuine sourced data or estimated figures.
 
----
+### 1. Sourced Coaching Metrics ("Vetri Palligal")
+We have loaded **genuine Government records** for Tamil Nadu's weekend NEET/JEE coaching centers:
+* **NEET/JEE Coaching Schools**: Plainly labeled as the real, confirmed count of coaching schools (364 total state-wide).
+* **NEET Coaching Enrolment (est.)**: Labeled clearly as an estimate, computed at 80 students per coaching school.
+* **JEE Coaching Enrolment (est.)**: Labeled clearly as an estimate, computed at 80 students per coaching school.
+* **Total Coaching Enrolment (est.)**: Labeled clearly as an estimate, computed at 160 students per coaching school.
 
-## Current Status
-
-The dashboard is currently running in **Preview Mode** — the structure, map, and all features are fully working, but the district numbers are estimated from official UDISE+ state-level figures (Government of India, 2022-23).
-
-> Once the real district-level figures are confirmed and provided, they will be loaded into the database — **no code change is needed**. The dashboard will immediately show the real numbers.
+### 2. General Infrastructure & Academic Metrics
+* **Total Schools**, **Active Labs**, **Teachers Staffed**, **Grid Connect**, **Sanitation**, **Active Blocks**: Sourced from official UDISE+ state-level figures (2022-23) mapped to districts.
+* **Attendance**: ⚠️ *Marked clearly as placeholder data* as reliable district-level public data is not yet available.
+* **NEET Qualified**: Deprecated / placeholders for compatibility.
 
 ---
 
-## Where the Data Comes From
+## Database Schema and Setup
 
-| Metric | Source |
-|--------|--------|
-| Total Schools | UDISE+ 2022-23 — Government of India ([udiseplus.gov.in](https://udiseplus.gov.in)) |
-| Hi-Tech Labs | UDISE+ 2022-23 — Infrastructure reports |
-| Teachers Staffed | UDISE+ 2022-23 — Teacher data |
-| Grid Connect | UDISE+ 2022-23 — Infrastructure reports |
-| WASH Audited | UDISE+ 2022-23 — Infrastructure reports |
-| Active Blocks | UDISE+ / State admin records |
-| **Attendance** | ⚠️ **To be provided by host** — not publicly available at district level |
-| **NEET Qualified** | ⚠️ **To be provided by host** — NTA only publishes state-level totals |
+The database uses Supabase PostgreSQL. Coaching metrics and school mapping are set up across the following tables:
+
+### 1. Tables Setup
+* **`districts`**: Base table containing Tamil Nadu's 38 districts with their official names and LGD codes.
+* **`district_metrics`**: General administrative metrics record per district.
+* **`vetri_district_metrics`**: Summary coaching metrics per district.
+* **`vetri_schools`**: Drill-down mapping table containing all 364 coaching schools linked to their corresponding district and block.
+
+### 2. Migration Execution Order
+Apply the migrations in the `supabase/migrations/` directory in this sequence:
+1. `20260630000000_create_district_table.sql` - Sets up the districts table.
+2. `20260716000000_create_vetri_schools_table.sql` - Creates the schools mapping and seeds the 364 real schools.
+3. `20260716000001_create_vetri_district_metrics_table.sql` - Creates and seeds the coaching metrics.
+
+> [!NOTE]
+> During SQL insertion and mapping, district name differences between the CSV lists and the reference tables (e.g. `VILLUPURAM` in the CSV maps to ID 37 `Viluppuram` in the DB, `THE NILGIRIS` maps to ID 18 `Nilgiris`, `SIVAGANGAI` to ID 24 `Sivaganga`, and `CHENNAI (EXT. GCC)` to ID 3 `Chennai`) have been fully normalized and matched on district LGD codes/IDs.
 
 ---
 
@@ -67,23 +89,13 @@ The dashboard is currently running in **Preview Mode** — the structure, map, a
    npm install
    ```
 
-2. **Add your Supabase keys** — create a `.env.local` file:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
+2. **Add Supabase keys** — create a `.env.local` file:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    ```
 
-3. **Set up the database** — run the SQL files in your Supabase SQL Editor:
-   * **First**, create the districts table and populate it:
-     ```
-     supabase/migrations/20260630000000_create_district_table.sql
-     ```
-   * **Second**, create the metrics table and insert the seed metrics data:
-     ```
-     supabase/district_metrics.sql
-     ```
-
-4. **Start the app**
+3. **Start the development server**
    ```bash
    npm run dev
    ```
@@ -91,30 +103,13 @@ The dashboard is currently running in **Preview Mode** — the structure, map, a
 
 ---
 
-## How to Update the Data (No Code Needed)
+## Technical Stack
 
-The database is designed so that updating district figures requires **no code change at all**.
-
-Simply run an `UPDATE` statement in the Supabase SQL Editor:
-```sql
-UPDATE district_metrics
-SET attendance = 94.50, neet_qualified = 1450
-WHERE district_id = (SELECT id FROM districts WHERE district_name = 'Chennai');
-```
+* **Core**: Next.js (TypeScript) & React (React 19)
+* **Database**: Supabase (PostgreSQL)
+* **Styling**: Tailwind CSS & Vanilla CSS (curated high-contrast dark theme elements)
+* **Visuals**: Recharts (distribution overview charts) & React Leaflet (interactive maps)
 
 ---
 
-## Built With
-
-| Tool | Purpose |
-|------|---------|
-| Next.js | Web framework |
-| TypeScript | Programming language |
-| Supabase | Database (PostgreSQL) |
-| Leaflet | Interactive map |
-| Tailwind CSS | Styling |
-| Vercel | Hosting |
-
----
-
-*Dashboard built for Day 10 milestone — fully working with real data integration ready.*
+*Vedasakthi Dashboard — Previewing Real Coaching Data Integration & School-level Drill-down.*
