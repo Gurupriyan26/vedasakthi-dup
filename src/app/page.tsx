@@ -7,7 +7,7 @@ import Sidebar from './components/Sidebar';
 import RightPanel from './components/RightPanel';
 import ChartsSection from './components/ChartsSection';
 import { useDashboard } from '@/hooks/useDashboard';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, X, BarChart2 } from 'lucide-react';
 
 const DistrictMap = dynamic(() => import('./components/DistrictMap'), {
   ssr: false,
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCharts, setShowCharts] = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -112,16 +113,35 @@ export default function DashboardPage() {
                 />
               </div>
 
+              {/* Toggle Button when Charts are hidden */}
+              {!showCharts && !loading && filteredDistricts.length > 0 && (
+                <button
+                  onClick={() => setShowCharts(true)}
+                  className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-5 py-2.5 bg-slate-900/95 hover:bg-slate-800 text-white text-[11px] font-black uppercase tracking-wider rounded-full border border-slate-700 shadow-2xl transition-all duration-300 flex items-center gap-2"
+                >
+                  <BarChart2 size={13} className="text-indigo-400" />
+                  Show Distribution Chart
+                </button>
+              )}
+
               {/* Charts — Floating sleek panel over the map */}
-              {!loading && filteredDistricts.length > 0 && (
+              {showCharts && !loading && filteredDistricts.length > 0 && (
                 <div
-                  className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-[1000] rounded-[24px] shadow-2xl border border-white/60 overflow-hidden"
+                  className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-[1000] rounded-[24px] shadow-2xl border border-white/60 overflow-hidden transition-all duration-300"
                   style={{
                     background: 'rgba(255, 255, 255, 0.75)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
                   }}
                 >
+                  {/* Close button */}
+                  <button
+                    onClick={() => setShowCharts(false)}
+                    className="absolute top-4 right-4 z-[1001] p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors"
+                    aria-label="Hide chart"
+                  >
+                    <X size={14} strokeWidth={2.5} />
+                  </button>
                   <ChartsSection districts={filteredDistricts} />
                 </div>
               )}
