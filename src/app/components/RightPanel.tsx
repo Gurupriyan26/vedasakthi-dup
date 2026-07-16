@@ -244,7 +244,10 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                           style={isActive ? { color: ac.hex } : {}}>
                           {m.label}
                         </div>
-                        <div className={`text-[16px] font-black tracking-tight leading-tight mt-0.5 transition-colors ${isActive ? 'text-white' : (dk ? 'text-slate-100' : 'text-slate-900')}`}>
+                        <div
+                          className={`text-[16px] font-black tracking-tight leading-tight mt-0.5 transition-colors ${!isActive ? (dk ? 'text-slate-100' : 'text-slate-900') : ''}`}
+                          style={isActive ? { color: dk ? '#ffffff' : ac.hex } : {}}
+                        >
                           {numVal !== null ? `${numVal}%` : m.value}
                         </div>
                       </div>
@@ -252,9 +255,13 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       {/* Gauge or chevron */}
                       <div className="flex-shrink-0 flex items-center justify-center">
                         {numVal !== null ? (
-                          <RadialGauge value={numVal} color={isActive ? '#ffffff' : ac.hex} size={32} />
+                          <RadialGauge value={numVal} color={isActive ? (dk ? '#ffffff' : ac.hex) : ac.hex} size={32} />
                         ) : (
-                          <ChevronRight size={14} className={`transition-all duration-200 ${isActive ? 'text-white' : (dk ? 'text-slate-600' : 'text-slate-300')} group-hover:translate-x-0.5`} />
+                          <ChevronRight
+                            size={14}
+                            style={isActive ? { color: dk ? '#ffffff' : ac.hex } : {}}
+                            className={`transition-all duration-200 ${!isActive ? (dk ? 'text-slate-600' : 'text-slate-300') : ''} group-hover:translate-x-0.5`}
+                          />
                         )}
                       </div>
                     </button>
