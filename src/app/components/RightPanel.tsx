@@ -4,284 +4,344 @@ import { useState, useEffect } from 'react';
 import { District } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
 import { fetchVetriSchools, VetriSchool } from '@/lib/api';
-import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Layers, Activity, X, MapPin } from 'lucide-react';
+import {
+  School, UserCheck, GraduationCap, FlaskConical, Users, Zap,
+  Droplet, Layers, Activity, X, MapPin, TrendingUp, BookOpen,
+  ChevronRight, Building2, Wifi
+} from 'lucide-react';
 
 interface RightPanelProps {
   selectedDistrict: District | null;
   onClearDistrict: () => void;
 }
 
-const getMetricColor = (color: string) => {
-  switch(color) {
-    case 'blue': return '#3b82f6';
-    case 'emerald': return '#10b981';
-    case 'purple': return '#a855f7';
-    case 'amber': return '#f59e0b';
-    case 'teal': return '#14b8a6';
-    case 'rose': return '#f43f5e';
-    case 'indigo': return '#6366f1';
-    default: return '#eab308'; // yellow for electricity
-  }
+const ACCENT_COLORS: Record<string, { hex: string; light: string; ring: string }> = {
+  blue:   { hex: '#3b82f6', light: '#eff6ff', ring: 'rgba(59,130,246,0.2)' },
+  emerald:{ hex: '#10b981', light: '#ecfdf5', ring: 'rgba(16,185,129,0.2)' },
+  purple: { hex: '#a855f7', light: '#faf5ff', ring: 'rgba(168,85,247,0.2)' },
+  amber:  { hex: '#f59e0b', light: '#fffbeb', ring: 'rgba(245,158,11,0.2)' },
+  teal:   { hex: '#14b8a6', light: '#f0fdfa', ring: 'rgba(20,184,166,0.2)' },
+  rose:   { hex: '#f43f5e', light: '#fff1f2', ring: 'rgba(244,63,94,0.2)' },
+  indigo: { hex: '#6366f1', light: '#eef2ff', ring: 'rgba(99,102,241,0.2)' },
+  yellow: { hex: '#eab308', light: '#fefce8', ring: 'rgba(234,179,8,0.2)' },
+};
+
+// Gauge circle for percentage metrics
+function RadialGauge({ value, color, size = 48 }: { value: number; color: string; size?: number }) {
+  const radius = (size - 8) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(value / 100, 1);
+  const offset = circumference - progress * circumference;
+  return (
+    <svg width={size} height={size} className="rotate-[-90deg]">
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth={5} />
+      <circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={circumference} strokeDashoffset={offset}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)' }}
+      />
+    </svg>
+  );
 }
 
 export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
   const { setMetric, selectedMetric, theme } = useDashboardStore();
   const [schools, setSchools] = useState<VetriSchool[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
+  const [schoolsExpanded, setSchoolsExpanded] = useState(true);
+
+  const dk = theme === 'dark';
 
   useEffect(() => {
-    if (!selectedDistrict) {
-      setSchools([]);
-      return;
-    }
-
-    let isMounted = true;
+    if (!selectedDistrict) { setSchools([]); return; }
+    let alive = true;
     setSchoolsLoading(true);
-
     fetchVetriSchools(selectedDistrict.id)
-      .then(data => {
-        if (isMounted) {
-          setSchools(data);
-          setSchoolsLoading(false);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setSchools([]);
-          setSchoolsLoading(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
+      .then(d => { if (alive) { setSchools(d); setSchoolsLoading(false); } })
+      .catch(() => { if (alive) { setSchools([]); setSchoolsLoading(false); } });
+    return () => { alive = false; };
   }, [selectedDistrict]);
 
+  /* ── Empty State ── */
   if (!selectedDistrict) {
     return (
-      <aside className={`hidden xl:flex flex-col w-[350px] flex-shrink-0 border-l p-8 items-center justify-center z-20 transition-all duration-300 ${
-        theme === 'dark' 
-          ? 'bg-[#0f172a] border-[#1e293b]' 
-          : 'bg-[#ffffff] border-[#e2e8f0]'
-      }`}>
-        <div className={`w-20 h-20 rounded-full border flex items-center justify-center mb-6 shadow-inner ${
-          theme === 'dark' 
-            ? 'border-slate-700 bg-slate-800 text-slate-500' 
-            : 'border-slate-200 bg-slate-50 text-slate-400'
-        }`}>
-          <Activity size={32} strokeWidth={1.5} />
+      <aside className={`hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l items-center justify-center z-20 transition-all duration-300 ${dk ? 'bg-[#0f172a] border-[#1e293b]' : 'bg-white border-[#e2e8f0]'}`}>
+        <div className={`relative w-24 h-24 rounded-3xl flex items-center justify-center mb-6 ${dk ? 'bg-[#1e293b]' : 'bg-slate-50 border border-slate-200'}`}>
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
+          <Activity size={36} strokeWidth={1.3} className={dk ? 'text-slate-500' : 'text-slate-350'} />
         </div>
-        <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
-          theme === 'dark' ? 'text-white' : 'text-slate-800'
-        }`}>No District Selected</h3>
-        <p className={`text-[13px] text-center leading-relaxed transition-colors duration-300 ${
-          theme === 'dark' ? 'text-slate-400' : 'text-slate-555'
-        }`}>
-          Select a district on the map to view detailed administrative metrics and performance indicators.
+        <h3 className={`font-black text-[17px] mb-2 ${dk ? 'text-white' : 'text-slate-800'}`}>No District Selected</h3>
+        <p className={`text-[12px] text-center leading-relaxed max-w-[200px] ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
+          Click on any district on the map to view its performance profile.
         </p>
+        <div className={`mt-8 flex flex-col gap-2 w-full px-10`}>
+          {['Coaching Schools', 'Attendance', 'Teachers Staffed', 'Lab Facilities'].map(hint => (
+            <div key={hint} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-semibold ${dk ? 'bg-[#1e293b] text-slate-400' : 'bg-slate-50 text-slate-500 border border-slate-200'}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${dk ? 'bg-indigo-400/40' : 'bg-indigo-300'}`} />
+              {hint}
+            </div>
+          ))}
+        </div>
       </aside>
     );
   }
 
   const { metrics } = selectedDistrict;
+  const districtName = selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy');
 
-  const kpiCards = [
-    { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), color: 'blue', icon: <School size={15} strokeWidth={2.5} /> },
-    { key: 'attendance', label: 'Attendance', value: `${Number(metrics?.attendance) || 0}%`, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
-    { key: 'coaching_schools', label: 'NEET/JEE Coaching Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.coaching_schools) || 0), color: 'purple', icon: <School size={15} strokeWidth={2.5} /> },
-    { key: 'neet_coaching_enrolment_est', label: 'NEET Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_coaching_enrolment_est) || 0), color: 'indigo', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
-    { key: 'jee_coaching_enrolment_est', label: 'JEE Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.jee_coaching_enrolment_est) || 0), color: 'rose', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
-    { key: 'total_coaching_enrolment_est', label: 'Total Coaching Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_coaching_enrolment_est) || 0), color: 'teal', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
-    { key: 'active_blocks', label: 'Active Blocks', value: metrics?.active_blocks || 0, color: 'amber', icon: <Layers size={15} strokeWidth={2.5} /> },
-    { key: 'teachers_staffed', label: 'Teachers Staffed', value: `${Number(metrics?.teachers_staffed) || 0}%`, color: 'teal', icon: <Users size={15} strokeWidth={2.5} /> },
-    { key: 'electricity', label: 'Grid Connected', value: `${Number(metrics?.electricity) || 0}%`, color: 'yellow', icon: <Zap size={15} strokeWidth={2.5} /> },
-    { key: 'hi_tech_labs', label: 'Lab Facilities', value: `${Number(metrics?.hi_tech_labs) || 0}%`, color: 'rose', icon: <FlaskConical size={15} strokeWidth={2.5} /> },
-    { key: 'wash_audited', label: 'Sanitation', value: `${Number(metrics?.wash_audited) || 0}%`, color: 'indigo', icon: <Droplet size={15} strokeWidth={2.5} /> },
+  /* Performance score (quick average of percent metrics) */
+  const pcts = [metrics?.attendance, metrics?.hi_tech_labs, metrics?.teachers_staffed, metrics?.electricity, metrics?.wash_audited].map(Number).filter(Boolean);
+  const avgScore = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : 0;
+  const scoreColor = avgScore >= 85 ? '#10b981' : avgScore >= 70 ? '#f59e0b' : '#f43f5e';
+  const scoreLabel = avgScore >= 85 ? 'High Performance' : avgScore >= 70 ? 'Average' : 'Needs Attention';
+
+  /* Grouped metric sections */
+  const sections = [
+    {
+      title: 'Schools & Infrastructure',
+      icon: <Building2 size={13} />,
+      color: 'blue',
+      metrics: [
+        { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), icon: <School size={14} strokeWidth={2.5} />, color: 'blue', isPercent: false },
+        { key: 'active_blocks', label: 'Active Blocks', value: String(metrics?.active_blocks || 0), icon: <Layers size={14} strokeWidth={2.5} />, color: 'amber', isPercent: false },
+        { key: 'electricity', label: 'Grid Connected', value: Number(metrics?.electricity) || 0, icon: <Zap size={14} strokeWidth={2.5} />, color: 'yellow', isPercent: true },
+        { key: 'wash_audited', label: 'Sanitation', value: Number(metrics?.wash_audited) || 0, icon: <Droplet size={14} strokeWidth={2.5} />, color: 'teal', isPercent: true },
+        { key: 'hi_tech_labs', label: 'Lab Facilities', value: Number(metrics?.hi_tech_labs) || 0, icon: <FlaskConical size={14} strokeWidth={2.5} />, color: 'rose', isPercent: true },
+      ],
+    },
+    {
+      title: 'Students & Faculty',
+      icon: <Users size={13} />,
+      color: 'emerald',
+      metrics: [
+        { key: 'attendance', label: 'Attendance Rate', value: Number(metrics?.attendance) || 0, icon: <UserCheck size={14} strokeWidth={2.5} />, color: 'emerald', isPercent: true },
+        { key: 'teachers_staffed', label: 'Teachers Staffed', value: Number(metrics?.teachers_staffed) || 0, icon: <Users size={14} strokeWidth={2.5} />, color: 'teal', isPercent: true },
+      ],
+    },
+    {
+      title: 'NEET / JEE Coaching',
+      icon: <GraduationCap size={13} />,
+      color: 'purple',
+      metrics: [
+        { key: 'coaching_schools', label: 'Coaching Centres', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.coaching_schools) || 0), icon: <School size={14} strokeWidth={2.5} />, color: 'purple', isPercent: false },
+        { key: 'neet_coaching_enrolment_est', label: 'NEET Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.neet_coaching_enrolment_est) || 0), icon: <BookOpen size={14} strokeWidth={2.5} />, color: 'indigo', isPercent: false },
+        { key: 'jee_coaching_enrolment_est', label: 'JEE Enrolment (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.jee_coaching_enrolment_est) || 0), icon: <BookOpen size={14} strokeWidth={2.5} />, color: 'rose', isPercent: false },
+        { key: 'total_coaching_enrolment_est', label: 'Total Coaching (est.)', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_coaching_enrolment_est) || 0), icon: <TrendingUp size={14} strokeWidth={2.5} />, color: 'teal', isPercent: false },
+      ],
+    },
   ];
 
   return (
-    <aside className={`hidden xl:flex flex-col w-[350px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${
-      theme === 'dark' 
-        ? 'bg-[#0f172a] border-[#1e293b]' 
-        : 'bg-[#ffffff] border-[#e2e8f0]'
-    }`}>
-      
-      {/* ── Header ── */}
-      <div className={`sticky top-0 z-20 pt-5 px-5 pb-4 border-b flex flex-col gap-1 backdrop-blur-md transition-all duration-300 ${
-        theme === 'dark' 
-          ? 'bg-[#0f172a]/90 border-[#1e293b]' 
-          : 'bg-white/90 border-[#e2e8f0]'
-      }`}>
-        <div className="flex items-center justify-between w-full">
-          <span className={`text-[10px] font-extrabold uppercase tracking-widest border px-2 py-0.5 rounded flex items-center gap-1.5 transition-colors duration-300 ${
-            theme === 'dark' 
-              ? 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' 
-              : 'text-indigo-650 bg-indigo-50 border-indigo-200'
-          }`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.6)]" />
+    <aside className={`hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${dk ? 'bg-[#0f172a] border-[#1e293b]' : 'bg-white border-[#e2e8f0]'}`}
+      style={{ scrollbarWidth: 'thin', scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent' }}>
+
+      {/* ══════════════════════════════════════════
+          HERO HEADER — District Banner
+      ══════════════════════════════════════════ */}
+      <div className={`relative overflow-hidden flex-shrink-0 px-5 pt-5 pb-6 border-b transition-all duration-300 ${dk ? 'border-[#1e293b] bg-gradient-to-br from-[#0f172a] via-[#0f172a] to-[#1a0f2e]' : 'border-[#e2e8f0] bg-gradient-to-br from-white via-white to-indigo-50/60'}`}>
+        {/* Decorative blurred orb */}
+        <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-20 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
+
+        {/* Top row: label + close */}
+        <div className="flex items-center justify-between mb-4 relative z-10">
+          <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${dk ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-600'}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" style={{ boxShadow: '0 0 6px rgba(129,140,248,0.8)' }} />
             District Profile
-          </span>
-          <button 
-            onClick={onClearDistrict}
-            className={`p-1.5 rounded-lg transition-colors duration-300 cursor-pointer ${
-              theme === 'dark' 
-                ? 'text-slate-500 hover:text-white hover:bg-slate-800' 
-                : 'text-slate-450 hover:text-slate-800 hover:bg-slate-100'
-            }`}
-            aria-label="Clear selection"
-          >
-            <X size={16} strokeWidth={2.5} />
+          </div>
+          <button onClick={onClearDistrict}
+            className={`p-1.5 rounded-lg cursor-pointer transition-all duration-200 hover:rotate-90 ${dk ? 'text-slate-500 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'}`}
+            aria-label="Clear selection">
+            <X size={15} strokeWidth={2.5} />
           </button>
         </div>
-        <h2 className={`text-[22px] font-black tracking-tight truncate mt-1.5 transition-colors duration-300 ${
-          theme === 'dark' ? 'text-white' : 'text-slate-900'
-        }`}>
-          {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
-        </h2>
-      </div>
 
-      {/* ── Compact Premium Dark Grid ── */}
-      <div className="p-4">
-        <div className="grid grid-cols-2 gap-3">
-          {kpiCards.map(card => {
-            const isActive = selectedMetric === card.key;
-            const accent = getMetricColor(card.color);
-            return (
-              <button
-                key={card.key}
-                onClick={() => setMetric(card.key as any)}
-                className={`
-                  relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
-                  ${isActive 
-                    ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
-                    : theme === 'dark'
-                      ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
-                      : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
-                  }
-                `}
-                style={{
-                  boxShadow: isActive ? `0 8px 24px -4px ${accent}40, 0 0 0 1.5px ${accent}` : undefined,
-                } as React.CSSProperties}
-              >
-                {/* Micro Gradient Background for Active State */}
-                {isActive && (
-                  <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${accent}30, transparent 70%)` }} />
-                )}
+        {/* District name + score ring */}
+        <div className="flex items-end justify-between gap-3 relative z-10">
+          <div className="flex-1 min-w-0">
+            <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>Tamil Nadu</p>
+            <h2 className={`text-[20px] font-black tracking-tight leading-tight ${dk ? 'text-white' : 'text-slate-900'}`}>
+              {districtName}
+            </h2>
+            <div className="flex items-center gap-2 mt-2.5">
+              <div className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" style={{ background: `${scoreColor}20`, color: scoreColor, border: `1px solid ${scoreColor}40` }}>
+                {scoreLabel}
+              </div>
+              <span className={`text-[10px] font-semibold ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
+                {metrics?.active_blocks || 0} active blocks
+              </span>
+            </div>
+          </div>
 
-                <div className="flex flex-col h-full relative z-10 w-full">
-                  <div className="flex items-center justify-between w-full mb-2">
-                    <div 
-                      className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
-                        !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
-                      }`} 
-                      style={{ 
-                        backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
-                        color: isActive ? '#ffffff' : accent 
-                      }}
-                    >
-                      {card.icon}
-                    </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
-                      isActive 
-                        ? 'text-white' 
-                        : theme === 'dark'
-                          ? 'text-slate-200'
-                          : 'text-slate-900'
-                    }`}>
-                      {card.value}
-                    </span>
-                  </div>
-                  
-                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-1 transition-colors duration-300 ${
-                    isActive 
-                      ? 'text-slate-200' 
-                      : theme === 'dark'
-                        ? 'text-slate-400'
-                        : 'text-slate-600'
-                  }`}>
-                    {card.label}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+          {/* Radial Gauge */}
+          <div className="relative flex-shrink-0 flex flex-col items-center">
+            <div className="relative w-14 h-14 flex items-center justify-center">
+              <RadialGauge value={avgScore} color={scoreColor} size={56} />
+              <span className="absolute text-[12px] font-black" style={{ color: scoreColor }}>{avgScore}%</span>
+            </div>
+            <span className={`text-[8px] font-bold uppercase tracking-widest mt-1 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>Avg Score</span>
+          </div>
         </div>
       </div>
 
-      {/* ── Vetri Palligal Coaching Centres list ── */}
-      {selectedDistrict && (
-        <div className={`flex flex-col flex-1 border-t mt-2 p-5 min-h-[250px] transition-all duration-300 ${
-          theme === 'dark' 
-            ? 'border-[#1e293b] bg-[#0b0f19]/30' 
-            : 'border-[#e2e8f0] bg-slate-50/50'
-        }`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className={`text-[11px] font-extrabold uppercase tracking-[0.15em] flex items-center gap-2 transition-colors duration-300 ${
-              theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
-            }`}>
-              <GraduationCap size={14} className="text-purple-400 animate-bounce" style={{ animationDuration: '3s' }} />
-              Coaching Centres ({schools.length})
-            </h3>
-            {schoolsLoading && (
-              <div className="w-3.5 h-3.5 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
-            )}
-          </div>
-
-          {schoolsLoading ? (
-            <div className="flex flex-col gap-2.5">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className={`rounded-xl p-3 animate-pulse h-14 border ${
-                  theme === 'dark' ? 'bg-[#1e293b]/40 border-slate-800/40' : 'bg-slate-100/50 border-slate-200/50'
-                }`} />
-              ))}
-            </div>
-          ) : schools.length > 0 ? (
-            <div className="overflow-y-auto max-h-[320px] flex flex-col gap-2 pr-1 scrollbar-thin">
-              {schools.map(school => (
-                <div 
-                  key={school.id} 
-                  className={`border rounded-xl p-3 flex flex-col gap-1 transition-all group ${
-                    theme === 'dark'
-                      ? 'bg-[#1e293b]/40 border-slate-800/60 hover:bg-[#1e293b]/70 hover:border-slate-700/60'
-                      : 'bg-white border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex gap-2 items-start">
-                    <div className={`p-1 rounded transition-colors mt-0.5 ${
-                      theme === 'dark' 
-                        ? 'bg-[#0f172a] text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300' 
-                        : 'bg-purple-50 text-purple-600 group-hover:bg-purple-100/80 group-hover:text-purple-800 border border-purple-100'
-                    }`}>
-                      <School size={12} />
-                    </div>
-                    <span className={`text-[11px] font-semibold transition-colors leading-tight ${
-                      theme === 'dark' ? 'text-slate-200 group-hover:text-white' : 'text-slate-700 group-hover:text-slate-900'
-                    }`}>
-                      {school.school_name}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 pl-6">
-                    <MapPin size={9} className="text-slate-500" />
-                    <span className="text-[9px] font-medium text-slate-400 uppercase tracking-wider">
-                      {school.block_name} Block
-                    </span>
-                  </div>
+      {/* ══════════════════════════════════════════
+          METRIC SECTIONS
+      ══════════════════════════════════════════ */}
+      <div className="flex flex-col gap-0 flex-1">
+        {sections.map((section) => {
+          const sectionAccent = ACCENT_COLORS[section.color] || ACCENT_COLORS.blue;
+          return (
+            <div key={section.title} className={`border-b transition-all duration-300 ${dk ? 'border-[#1e293b]' : 'border-[#f1f5f9]'}`}>
+              {/* Section header */}
+              <div className={`px-5 pt-4 pb-2 flex items-center gap-2`}>
+                <div className="p-1 rounded-md" style={{ background: `${sectionAccent.hex}18`, color: sectionAccent.hex }}>
+                  {section.icon}
                 </div>
-              ))}
+                <span className={`text-[10px] font-extrabold uppercase tracking-widest ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {section.title}
+                </span>
+              </div>
+
+              {/* Metrics in this section */}
+              <div className="px-4 pb-4 flex flex-col gap-1.5">
+                {section.metrics.map((m) => {
+                  const isActive = selectedMetric === m.key;
+                  const ac = ACCENT_COLORS[m.color] || ACCENT_COLORS.blue;
+                  const numVal = typeof m.value === 'number' ? m.value : null;
+
+                  return (
+                    <button
+                      key={m.key}
+                      onClick={() => setMetric(m.key as any)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 cursor-pointer group border ${
+                        isActive
+                          ? `border-transparent`
+                          : dk
+                            ? 'border-transparent hover:border-slate-700/60 hover:bg-[#1e293b]/60'
+                            : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
+                      }`}
+                      style={isActive ? {
+                        background: `linear-gradient(135deg, ${ac.hex}15, ${ac.hex}08)`,
+                        border: `1px solid ${ac.hex}35`,
+                        boxShadow: `0 2px 12px ${ac.hex}18`,
+                      } : undefined}
+                    >
+                      {/* Icon */}
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200`}
+                        style={{
+                          background: isActive ? ac.hex : (dk ? '#1e293b' : ac.light),
+                          color: isActive ? '#fff' : ac.hex,
+                          boxShadow: isActive ? `0 4px 12px ${ac.hex}40` : 'none',
+                        }}>
+                        {m.icon}
+                      </div>
+
+                      {/* Label + value */}
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${isActive ? '' : (dk ? 'text-slate-400' : 'text-slate-500')}`}
+                          style={isActive ? { color: ac.hex } : {}}>
+                          {m.label}
+                        </div>
+                        <div className={`text-[16px] font-black tracking-tight leading-tight mt-0.5 transition-colors ${isActive ? 'text-white' : (dk ? 'text-slate-100' : 'text-slate-900')}`}>
+                          {numVal !== null ? `${numVal}%` : m.value}
+                        </div>
+                      </div>
+
+                      {/* Gauge or chevron */}
+                      <div className="flex-shrink-0 flex items-center justify-center">
+                        {numVal !== null ? (
+                          <RadialGauge value={numVal} color={isActive ? '#ffffff' : ac.hex} size={32} />
+                        ) : (
+                          <ChevronRight size={14} className={`transition-all duration-200 ${isActive ? 'text-white' : (dk ? 'text-slate-600' : 'text-slate-300')} group-hover:translate-x-0.5`} />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            <div className={`flex-1 flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed ${
-              theme === 'dark' ? 'bg-[#1e293b]/20 border-slate-800/50' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <span className="text-2xl mb-2">🏫</span>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">No Centres Registered</p>
-              <p className="text-[9px] text-slate-400 mt-1 max-w-[200px] leading-relaxed">
-                There are no Vetri Palligal coaching centres listed for this district.
-              </p>
+          );
+        })}
+
+        {/* ══════════════════════════════════════════
+            VETRI PALLIGAL COACHING CENTRES
+        ══════════════════════════════════════════ */}
+        <div className={`flex flex-col transition-all duration-300 ${dk ? 'bg-[#080d15]/40' : 'bg-slate-50/70'}`}>
+          {/* Collapsible header */}
+          <button
+            onClick={() => setSchoolsExpanded(p => !p)}
+            className={`flex items-center justify-between px-5 py-3.5 w-full cursor-pointer transition-colors ${dk ? 'hover:bg-[#1e293b]/40' : 'hover:bg-slate-100/80'}`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-md bg-purple-500/15 text-purple-400">
+                <GraduationCap size={13} />
+              </div>
+              <span className={`text-[10px] font-extrabold uppercase tracking-widest ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
+                Coaching Centres
+              </span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black"
+                style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7' }}>
+                {schoolsLoading ? '…' : schools.length}
+              </span>
+            </div>
+            <div className={`p-1 rounded-md transition-all duration-300 ${schoolsExpanded ? 'rotate-90' : ''} ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
+              <ChevronRight size={14} />
+            </div>
+          </button>
+
+          {/* School list */}
+          {schoolsExpanded && (
+            <div className="px-4 pb-4">
+              {schoolsLoading ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className={`h-12 rounded-xl animate-pulse ${dk ? 'bg-[#1e293b]/50' : 'bg-slate-200/60'}`} />
+                  ))}
+                </div>
+              ) : schools.length > 0 ? (
+                <div className="flex flex-col gap-1.5">
+                  {schools.map((school, idx) => (
+                    <div key={school.id}
+                      className={`group flex items-start gap-3 px-3 py-2.5 rounded-xl border transition-all duration-200 cursor-default ${
+                        dk
+                          ? 'bg-[#1e293b]/30 border-slate-800/50 hover:bg-[#1e293b]/60 hover:border-slate-700/60'
+                          : 'bg-white border-slate-200/70 hover:border-slate-300 hover:shadow-sm'
+                      }`}>
+                      {/* Index badge */}
+                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5 ${dk ? 'bg-purple-500/15 text-purple-400' : 'bg-purple-50 text-purple-600 border border-purple-100'}`}>
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[11px] font-semibold leading-tight truncate transition-colors ${dk ? 'text-slate-200 group-hover:text-white' : 'text-slate-700 group-hover:text-slate-900'}`}>
+                          {school.school_name}
+                        </p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <MapPin size={8} className={dk ? 'text-slate-600' : 'text-slate-400'} />
+                          <span className={`text-[9px] font-medium uppercase tracking-wide ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
+                            {school.block_name}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={`flex flex-col items-center justify-center py-8 rounded-2xl border border-dashed text-center ${dk ? 'bg-[#1e293b]/20 border-slate-800/50' : 'bg-white border-slate-200'}`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${dk ? 'bg-slate-800 text-slate-500' : 'bg-slate-50 text-slate-350 border border-slate-200'}`}>
+                    <Wifi size={20} strokeWidth={1.5} />
+                  </div>
+                  <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>No Centres Registered</p>
+                  <p className={`text-[10px] leading-relaxed max-w-[170px] ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
+                    No Vetri Palligal coaching centres listed for this district.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
+      </div>
     </aside>
   );
 }
