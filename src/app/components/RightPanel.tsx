@@ -91,7 +91,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
     <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#0f172a] border-l border-[#1e293b] h-full overflow-y-auto z-20">
       
       {/* ── Header ── */}
-      <div className="sticky top-0 z-10 pt-5 px-5 pb-4 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#1e293b] flex flex-col gap-1">
+      <div className="sticky top-0 z-20 pt-5 px-5 pb-4 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#1e293b] flex flex-col gap-1">
         <div className="flex items-center justify-between w-full">
           <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.6)]" />

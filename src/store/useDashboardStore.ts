@@ -24,7 +24,7 @@ interface DashboardState {
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
-  selectedMetric: 'general', // Default metric
+  selectedMetric: 'coaching_schools', // Default metric to coaching schools
   selectedDistrictId: null,
   setMetric: (metric) => set({ selectedMetric: metric }),
   setSelectedDistrictId: (id) => set({ selectedDistrictId: id }),

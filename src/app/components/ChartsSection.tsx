@@ -75,7 +75,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
     return sum / chartData.length;
   }, [chartData]);
 
-  if (chartData.length === 0) return null;
+  if (selectedMetric === 'general' || chartData.length === 0) return null;
 
   const label = METRIC_LABELS[selectedMetric] || selectedMetric.replace(/_/g, ' ');
   const isPercent = PERCENT_METRICS.has(selectedMetric);
