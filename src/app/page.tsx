@@ -8,6 +8,7 @@ import RightPanel from './components/RightPanel';
 import ChartsSection from './components/ChartsSection';
 import { useDashboard } from '@/hooks/useDashboard';
 import { RefreshCw, X, BarChart2 } from 'lucide-react';
+import { useDashboardStore } from '@/store/useDashboardStore';
 
 const DistrictMap = dynamic(() => import('./components/DistrictMap'), {
   ssr: false,
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCharts, setShowCharts] = useState(true);
+  const { theme } = useDashboardStore();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -52,7 +54,17 @@ export default function DashboardPage() {
   // Skeleton loading shell
   if (!mounted) {
     return (
-      <div className="flex flex-col h-screen" style={{ background: 'var(--bg)', overflow: 'hidden' }}>
+      <div 
+        className="flex flex-col h-screen transition-all duration-300" 
+        style={{ 
+          background: theme === 'dark' ? '#0f172a' : '#f4f7f6', 
+          overflow: 'hidden',
+          ['--bg' as any]: theme === 'dark' ? '#0f172a' : '#f4f7f6',
+          ['--surface' as any]: theme === 'dark' ? '#1e293b' : '#ffffff',
+          ['--border' as any]: theme === 'dark' ? '#1e293b' : '#e0e6ed',
+          ['--skeleton-bg' as any]: theme === 'dark' ? '#1e293b' : '#e2e8f0',
+        }}
+      >
         <div className="vs-header">
           <div className="flex items-center gap-3">
             <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg,#3b82f6,#6366f1)' }} />
@@ -77,7 +89,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: 'var(--bg)', overflow: 'hidden' }}>
+    <div 
+      className="flex flex-col h-screen transition-all duration-300" 
+      style={{ 
+        background: theme === 'dark' ? '#0f172a' : '#f4f7f6', 
+        overflow: 'hidden',
+        ['--bg' as any]: theme === 'dark' ? '#0f172a' : '#f4f7f6',
+        ['--surface' as any]: theme === 'dark' ? '#1e293b' : '#ffffff',
+        ['--border' as any]: theme === 'dark' ? '#1e293b' : '#e0e6ed',
+      }}
+    >
       <Header loading={loading} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <div className="flex flex-1 overflow-hidden">

@@ -56,4 +56,17 @@ body {
 .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 .animate-slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.leaflet-container { background: #f4f7f6 !important; font-family: 'Inter', sans-serif; }
+.leaflet-container { background: var(--bg) !important; font-family: 'Inter', sans-serif; }
+
+/* Dynamic Skeleton Loader styling */
+.skeleton {
+  background: var(--skeleton-bg, #e2e8f0);
+  position: relative;
+  overflow: hidden;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}

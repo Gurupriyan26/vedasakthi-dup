@@ -90,7 +90,7 @@ function getMetricColor(metric: MetricType, value?: number, districtId?: number)
 const PERCENT_METRICS = new Set(['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited', 'infra_status']);
 
 export default function DistrictMap({ districts, loading, onDistrictSelect, selectedDistrictId }: DistrictMapProps) {
-  const { selectedMetric } = useDashboardStore();
+  const { selectedMetric, theme } = useDashboardStore();
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
@@ -166,12 +166,12 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
     const color = getMetricColor(selectedMetric, metricValue, district?.id);
 
     layer.bindTooltip(
-      `<div style="font-family:Inter,sans-serif;padding:12px;min-width:160px;background:#ffffff;border-radius:8px;border:1px solid #e2e8f0;box-shadow:0 4px 15px rgba(0,0,0,0.05)">
-        <div style="font-size:9px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${METRIC_LABELS[selectedMetric] || selectedMetric.replace(/_/g,' ')}</div>
-        <div style="font-size:15px;font-weight:900;color:#1e293b;margin-bottom:8px">${resolvedName}</div>
+      `<div style="font-family:Inter,sans-serif;padding:12px;min-width:160px;background:${theme === 'dark' ? '#0f172a' : '#ffffff'};border-radius:8px;border:1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'};box-shadow:0 4px 15px rgba(0,0,0,0.15)">
+        <div style="font-size:9px;font-weight:800;color:${theme === 'dark' ? '#94a3b8' : '#64748b'};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${METRIC_LABELS[selectedMetric] || selectedMetric.replace(/_/g,' ')}</div>
+        <div style="font-size:15px;font-weight:900;color:${theme === 'dark' ? '#ffffff' : '#1e293b'};margin-bottom:8px">${resolvedName}</div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;"></div>
-          <span style="font-size:18px;font-weight:900;color:#1e293b;letter-spacing:-0.03em">${displayValue}</span>
+          <span style="font-size:18px;font-weight:900;color:${theme === 'dark' ? '#ffffff' : '#1e293b'};letter-spacing:-0.03em">${displayValue}</span>
         </div>
       </div>`,
       { sticky: true, direction: 'top', className: 'leaflet-tooltip-clean-dark pointer-events-none', offset: [0, -6] }
@@ -226,7 +226,7 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
       >
         <TileLayer
           attribution='&copy; <a href="https://carto.com">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url={theme === 'dark' ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"}
         />
         <ZoomControl position="topright" />
         {geoData && !loading && (
@@ -254,8 +254,14 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
 
       {/* Host Required Performance Legend */}
       {selectedMetric !== 'general' && (
-        <div className="absolute bottom-20 right-6 z-[1000] bg-[#0f172a]/85 backdrop-blur-md rounded-2xl p-4 border border-[#1e293b] shadow-2xl flex flex-col gap-3">
-          <div className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 border-b border-[#1e293b]/80 pb-1.5 mb-0.5">
+        <div className={`absolute bottom-20 right-6 z-[1000] rounded-2xl p-4 border shadow-2xl flex flex-col gap-3 transition-colors duration-300 ${
+          theme === 'dark'
+            ? 'bg-[#0f172a]/85 border-[#1e293b]'
+            : 'bg-white/95 border-slate-200'
+        }`}>
+          <div className={`text-[9px] font-black uppercase tracking-[0.15em] border-b pb-1.5 mb-0.5 transition-colors duration-300 ${
+            theme === 'dark' ? 'text-slate-400 border-[#1e293b]/80' : 'text-slate-500 border-slate-200/80'
+          }`}>
             Performance Index
           </div>
           {[
@@ -268,7 +274,9 @@ export default function DistrictMap({ districts, loading, onDistrictSelect, sele
                 className="w-3 h-3 rounded-full"
                 style={{ background: color, boxShadow: `0 0 8px ${color}80` }}
               />
-              <span className="text-[11px] font-bold text-slate-300 transition-colors group-hover:text-white">{label}</span>
+              <span className={`text-[11px] font-bold transition-colors group-hover:text-white ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}>{label}</span>
             </div>
           ))}
         </div>

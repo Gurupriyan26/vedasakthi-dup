@@ -25,7 +25,7 @@ const getMetricColor = (color: string) => {
 }
 
 export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
-  const { setMetric, selectedMetric } = useDashboardStore();
+  const { setMetric, selectedMetric, theme } = useDashboardStore();
   const [schools, setSchools] = useState<VetriSchool[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
 
@@ -59,12 +59,24 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
 
   if (!selectedDistrict) {
     return (
-      <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#0f172a] border-l border-[#1e293b] p-8 items-center justify-center z-20">
-        <div className="w-20 h-20 rounded-full border border-slate-700 flex items-center justify-center mb-6 bg-slate-800 text-slate-500 shadow-inner">
+      <aside className={`hidden xl:flex flex-col w-[350px] flex-shrink-0 border-l p-8 items-center justify-center z-20 transition-all duration-300 ${
+        theme === 'dark' 
+          ? 'bg-[#0f172a] border-[#1e293b]' 
+          : 'bg-[#ffffff] border-[#e2e8f0]'
+      }`}>
+        <div className={`w-20 h-20 rounded-full border flex items-center justify-center mb-6 shadow-inner ${
+          theme === 'dark' 
+            ? 'border-slate-700 bg-slate-800 text-slate-500' 
+            : 'border-slate-200 bg-slate-50 text-slate-400'
+        }`}>
           <Activity size={32} strokeWidth={1.5} />
         </div>
-        <h3 className="text-white font-bold text-lg mb-2">No District Selected</h3>
-        <p className="text-slate-400 text-[13px] text-center leading-relaxed">
+        <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
+          theme === 'dark' ? 'text-white' : 'text-slate-800'
+        }`}>No District Selected</h3>
+        <p className={`text-[13px] text-center leading-relaxed transition-colors duration-300 ${
+          theme === 'dark' ? 'text-slate-400' : 'text-slate-555'
+        }`}>
           Select a district on the map to view detailed administrative metrics and performance indicators.
         </p>
       </aside>
@@ -88,24 +100,42 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
   ];
 
   return (
-    <aside className="hidden xl:flex flex-col w-[350px] flex-shrink-0 bg-[#0f172a] border-l border-[#1e293b] h-full overflow-y-auto z-20">
+    <aside className={`hidden xl:flex flex-col w-[350px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${
+      theme === 'dark' 
+        ? 'bg-[#0f172a] border-[#1e293b]' 
+        : 'bg-[#ffffff] border-[#e2e8f0]'
+    }`}>
       
       {/* ── Header ── */}
-      <div className="sticky top-0 z-20 pt-5 px-5 pb-4 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#1e293b] flex flex-col gap-1">
+      <div className={`sticky top-0 z-20 pt-5 px-5 pb-4 border-b flex flex-col gap-1 backdrop-blur-md transition-all duration-300 ${
+        theme === 'dark' 
+          ? 'bg-[#0f172a]/90 border-[#1e293b]' 
+          : 'bg-white/90 border-[#e2e8f0]'
+      }`}>
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded flex items-center gap-1.5">
+          <span className={`text-[10px] font-extrabold uppercase tracking-widest border px-2 py-0.5 rounded flex items-center gap-1.5 transition-colors duration-300 ${
+            theme === 'dark' 
+              ? 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' 
+              : 'text-indigo-650 bg-indigo-50 border-indigo-200'
+          }`}>
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.6)]" />
             District Profile
           </span>
           <button 
             onClick={onClearDistrict}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
+            className={`p-1.5 rounded-lg transition-colors duration-300 cursor-pointer ${
+              theme === 'dark' 
+                ? 'text-slate-500 hover:text-white hover:bg-slate-800' 
+                : 'text-slate-450 hover:text-slate-800 hover:bg-slate-100'
+            }`}
             aria-label="Clear selection"
           >
             <X size={16} strokeWidth={2.5} />
           </button>
         </div>
-        <h2 className="text-[22px] font-black text-white tracking-tight truncate mt-1.5">
+        <h2 className={`text-[22px] font-black tracking-tight truncate mt-1.5 transition-colors duration-300 ${
+          theme === 'dark' ? 'text-white' : 'text-slate-900'
+        }`}>
           {selectedDistrict.district_name.replace('Tiruchirappalli', 'Trichy').replace('Ramanathapuram', 'Ramanathapuram')}
         </h2>
       </div>
@@ -121,10 +151,12 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                 key={card.key}
                 onClick={() => setMetric(card.key as any)}
                 className={`
-                  relative flex flex-col justify-between bg-[#1e293b] rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
                   ${isActive 
-                    ? 'transform -translate-y-1' 
-                    : 'border border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
+                    ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
+                    : theme === 'dark'
+                      ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
+                      : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
@@ -139,20 +171,34 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                 <div className="flex flex-col h-full relative z-10 w-full">
                   <div className="flex items-center justify-between w-full mb-2">
                     <div 
-                      className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
+                      className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
+                        !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
+                      }`} 
                       style={{ 
-                        backgroundColor: isActive ? accent : '#0f172a', 
+                        backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
                         color: isActive ? '#ffffff' : accent 
                       }}
                     >
                       {card.icon}
                     </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-200'}`}>
+                    <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
+                      isActive 
+                        ? 'text-white' 
+                        : theme === 'dark'
+                          ? 'text-slate-200'
+                          : 'text-slate-900'
+                    }`}>
                       {card.value}
                     </span>
                   </div>
                   
-                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-1 ${isActive ? 'text-slate-200' : 'text-slate-400'}`}>
+                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-1 transition-colors duration-300 ${
+                    isActive 
+                      ? 'text-slate-200' 
+                      : theme === 'dark'
+                        ? 'text-slate-400'
+                        : 'text-slate-600'
+                  }`}>
                     {card.label}
                   </span>
                 </div>
@@ -164,9 +210,15 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
 
       {/* ── Vetri Palligal Coaching Centres list ── */}
       {selectedDistrict && (
-        <div className="flex flex-col flex-1 border-t border-[#1e293b] mt-2 p-5 bg-[#0b0f19]/30 min-h-[250px]">
+        <div className={`flex flex-col flex-1 border-t mt-2 p-5 min-h-[250px] transition-all duration-300 ${
+          theme === 'dark' 
+            ? 'border-[#1e293b] bg-[#0b0f19]/30' 
+            : 'border-[#e2e8f0] bg-slate-50/50'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-[0.15em] flex items-center gap-2">
+            <h3 className={`text-[11px] font-extrabold uppercase tracking-[0.15em] flex items-center gap-2 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
+            }`}>
               <GraduationCap size={14} className="text-purple-400 animate-bounce" style={{ animationDuration: '3s' }} />
               Coaching Centres ({schools.length})
             </h3>
@@ -178,7 +230,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
           {schoolsLoading ? (
             <div className="flex flex-col gap-2.5">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-[#1e293b]/40 rounded-xl p-3 animate-pulse h-14 border border-slate-800/40" />
+                <div key={i} className={`rounded-xl p-3 animate-pulse h-14 border ${
+                  theme === 'dark' ? 'bg-[#1e293b]/40 border-slate-800/40' : 'bg-slate-100/50 border-slate-200/50'
+                }`} />
               ))}
             </div>
           ) : schools.length > 0 ? (
@@ -186,13 +240,23 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
               {schools.map(school => (
                 <div 
                   key={school.id} 
-                  className="bg-[#1e293b]/40 border border-slate-800/60 rounded-xl p-3 flex flex-col gap-1 transition-all hover:bg-[#1e293b]/70 hover:border-slate-700/60 group"
+                  className={`border rounded-xl p-3 flex flex-col gap-1 transition-all group ${
+                    theme === 'dark'
+                      ? 'bg-[#1e293b]/40 border-slate-800/60 hover:bg-[#1e293b]/70 hover:border-slate-700/60'
+                      : 'bg-white border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
                 >
                   <div className="flex gap-2 items-start">
-                    <div className="p-1 rounded bg-[#0f172a] text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors mt-0.5">
+                    <div className={`p-1 rounded transition-colors mt-0.5 ${
+                      theme === 'dark' 
+                        ? 'bg-[#0f172a] text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300' 
+                        : 'bg-purple-50 text-purple-600 group-hover:bg-purple-100/80 group-hover:text-purple-800 border border-purple-100'
+                    }`}>
                       <School size={12} />
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-200 group-hover:text-white transition-colors leading-tight">
+                    <span className={`text-[11px] font-semibold transition-colors leading-tight ${
+                      theme === 'dark' ? 'text-slate-200 group-hover:text-white' : 'text-slate-700 group-hover:text-slate-900'
+                    }`}>
                       {school.school_name}
                     </span>
                   </div>
@@ -206,7 +270,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
               ))}
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-[#1e293b]/20 rounded-2xl border border-dashed border-slate-800/50">
+            <div className={`flex-1 flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed ${
+              theme === 'dark' ? 'bg-[#1e293b]/20 border-slate-800/50' : 'bg-slate-50 border-slate-200'
+            }`}>
               <span className="text-2xl mb-2">🏫</span>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">No Centres Registered</p>
               <p className="text-[9px] text-slate-400 mt-1 max-w-[200px] leading-relaxed">

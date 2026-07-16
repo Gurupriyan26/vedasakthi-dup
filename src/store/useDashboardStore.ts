@@ -19,13 +19,17 @@ export type MetricType =
 interface DashboardState {
   selectedMetric: MetricType;
   selectedDistrictId: number | null;
+  theme: 'light' | 'dark';
   setMetric: (metric: MetricType) => void;
   setSelectedDistrictId: (id: number | null) => void;
+  toggleTheme: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
   selectedMetric: 'coaching_schools', // Default metric to coaching schools
   selectedDistrictId: null,
+  theme: 'dark', // Default to dark mode
   setMetric: (metric) => set({ selectedMetric: metric }),
   setSelectedDistrictId: (id) => set({ selectedDistrictId: id }),
+  toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
 }));

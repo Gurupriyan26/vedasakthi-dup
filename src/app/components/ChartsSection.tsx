@@ -56,7 +56,7 @@ function getMetricColor(metric: MetricType, value?: number): string {
 const PERCENT_METRICS = new Set(['attendance', 'hi_tech_labs', 'teachers_staffed', 'electricity', 'wash_audited']);
 
 export default function ChartsSection({ districts }: ChartsSectionProps) {
-  const { selectedMetric } = useDashboardStore();
+  const { selectedMetric, theme } = useDashboardStore();
 
   const chartData = useMemo(() => {
     return districts
@@ -84,33 +84,39 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   return (
     <div className="flex flex-col xl:flex-row p-3 bg-transparent">
       {/* ── Bar Chart ── */}
-      <div className="flex-1 rounded-xl p-4 min-h-[120px] bg-white/50 border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md">
+      <div className={`flex-1 rounded-xl p-4 min-h-[120px] border shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
+        theme === 'dark'
+          ? 'bg-[#0f172a]/85 border-[#1e293b]'
+          : 'bg-white/50 border-white/60'
+      }`}>
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         
-        <div className="text-[10px] font-black uppercase tracking-widest mb-5 text-slate-400 relative z-10">
+        <div className={`text-[10px] font-black uppercase tracking-widest mb-5 relative z-10 transition-colors duration-300 ${
+          theme === 'dark' ? 'text-slate-400' : 'text-slate-450'
+        }`}>
           Distribution Overview — {label}
         </div>
         <div className="relative z-10 w-full h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#e2e8f0'} />
               <XAxis
                 dataKey="name"
-                axisLine={{ stroke: '#cbd5e1' }}
+                axisLine={{ stroke: theme === 'dark' ? '#1e293b' : '#cbd5e1' }}
                 tickLine={false}
                 tick={false}
                 height={10}
               />
               <ReferenceLine 
                 y={averageValue} 
-                stroke="#6366f1" 
+                stroke={theme === 'dark' ? '#818cf8' : '#6366f1'} 
                 strokeDasharray="4 4" 
                 strokeWidth={2}
                 label={{ 
                   position: 'top', 
                   value: `STATE AVG: ${fmt(Math.round(averageValue))}`, 
-                  fill: '#6366f1', 
+                  fill: theme === 'dark' ? '#818cf8' : '#6366f1', 
                   fontSize: 10, 
                   fontWeight: 900,
                   fontFamily: 'Inter, sans-serif'
@@ -119,22 +125,22 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+                tick={{ fontSize: 11, fill: theme === 'dark' ? '#94a3b8' : '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
               />
               <Tooltip
-                cursor={{ fill: '#f8fafc' }}
+                cursor={{ fill: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : '#f8fafc' }}
                 contentStyle={{
-                  background: '#ffffff',
+                  background: theme === 'dark' ? '#0f172a' : '#ffffff',
                   borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
+                  border: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '12px',
-                  color: '#1e293b',
+                  color: theme === 'dark' ? '#ffffff' : '#1e293b',
                   padding: '14px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
                 }}
-                itemStyle={{ color: '#1e293b', fontWeight: 900 }}
-                labelStyle={{ color: '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
+                itemStyle={{ color: theme === 'dark' ? '#ffffff' : '#1e293b', fontWeight: 900 }}
+                labelStyle={{ color: theme === 'dark' ? '#94a3b8' : '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
                 formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
               />
               <Bar dataKey="value" radius={[20, 20, 20, 20]}>

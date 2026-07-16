@@ -24,7 +24,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ districts, loading }: SidebarProps) {
-  const { selectedMetric, setMetric } = useDashboardStore();
+  const { selectedMetric, setMetric, theme } = useDashboardStore();
 
   const computedMetrics = useMemo(() => {
     if (districts.length === 0) {
@@ -132,12 +132,12 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
 
   return (
     <aside
-      className="flex flex-col h-full flex-shrink-0 overflow-y-auto custom-scrollbar"
+      className="flex flex-col h-full flex-shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300"
       style={{ 
         width: '350px', 
         zIndex: 10, 
-        background: '#0f172a',
-        borderRight: '1px solid #1e293b',
+        background: theme === 'dark' ? '#0f172a' : '#ffffff',
+        borderRight: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
       }}
     >
       <div className="p-4">
@@ -148,13 +148,21 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
             <TrendingUp size={18} strokeWidth={2.5} className="text-white" />
           </div>
           <div>
-            <h2 className="text-[13px] font-black text-white uppercase tracking-widest leading-tight">TN Education</h2>
-            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dashboard Prototype</p>
+            <h2 className={`text-[13px] font-black uppercase tracking-widest leading-tight transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>TN Education</h2>
+            <p className={`text-[10px] font-bold tracking-widest uppercase transition-colors duration-300 ${
+              theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+            }`}>Dashboard Prototype</p>
           </div>
         </div>
 
         {/* ── Instructions Banner ── */}
-        <div className="mb-5 rounded-lg p-3 text-[11px] bg-[#1e293b] text-slate-300 border border-slate-700/50 flex items-center gap-2.5 shadow-inner">
+        <div className={`mb-5 rounded-lg p-3 text-[11px] border flex items-center gap-2.5 shadow-inner transition-colors duration-300 ${
+          theme === 'dark' 
+            ? 'bg-[#1e293b] text-slate-300 border-slate-700/50' 
+            : 'bg-slate-50 text-slate-650 border-slate-200'
+        }`}>
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)] flex-shrink-0" />
           <span className="leading-relaxed tracking-wide"><strong>DATA MODE:</strong> SELECT METRIC TO RENDER HEATMAP.</span>
         </div>
@@ -169,10 +177,12 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 key={m.key}
                 onClick={() => setMetric(m.key)}
                 className={`
-                  relative flex flex-col justify-between bg-[#1e293b] rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group
+                  relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
                   ${isActive 
-                    ? 'transform -translate-y-1' 
-                    : 'border border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
+                    ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
+                    : theme === 'dark'
+                      ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
+                      : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
                   }
                 `}
                 style={{
@@ -187,20 +197,34 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
                 <div className="flex flex-col h-full relative z-10 w-full">
                   <div className="flex items-center justify-between w-full mb-2">
                     <div 
-                      className="p-1.5 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm" 
+                      className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
+                        !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
+                      }`} 
                       style={{ 
-                        backgroundColor: isActive ? accent : '#0f172a', 
+                        backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
                         color: isActive ? '#ffffff' : accent 
                       }}
                     >
                       {m.icon}
                     </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-200'}`}>
+                    <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
+                      isActive 
+                        ? 'text-white' 
+                        : theme === 'dark'
+                          ? 'text-slate-200'
+                          : 'text-slate-900'
+                    }`}>
                       {m.value}
                     </span>
                   </div>
                   
-                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-2 ${isActive ? 'text-slate-200' : 'text-slate-400'}`}>
+                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-2 transition-colors duration-300 ${
+                    isActive 
+                      ? 'text-slate-200' 
+                      : theme === 'dark'
+                        ? 'text-slate-400'
+                        : 'text-slate-600'
+                  }`}>
                     {m.label}
                   </span>
                 </div>
@@ -213,8 +237,8 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: ${theme === 'dark' ? '#334155' : '#cbd5e1'}; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: ${theme === 'dark' ? '#475569' : '#94a3b8'}; }
       `}} />
     </aside>
   );
