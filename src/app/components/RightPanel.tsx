@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { District } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
 import { fetchVetriSchools, VetriSchool } from '@/lib/api';
 import {
   School, UserCheck, GraduationCap, FlaskConical, Users, Zap,
   Droplet, Layers, Activity, X, MapPin, TrendingUp, BookOpen,
-  ChevronRight, Building2, Wifi
+  ChevronRight, Building2, ChevronDown, BookMarked, ToggleLeft
 } from 'lucide-react';
 
 interface RightPanelProps {
@@ -46,11 +46,107 @@ function RadialGauge({ value, color, size = 48 }: { value: number; color: string
   );
 }
 
+// ── Block accordion row ───────────────────────────────────────────────────────
+function BlockRow({
+  blockName,
+  schools,
+  idx,
+  dk,
+}: {
+  blockName: string;
+  schools: VetriSchool[];
+  idx: number;
+  dk: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const hues = ['#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#3b82f6', '#f59e0b'];
+  const glow = hues[idx % hues.length];
+
+  return (
+    <div className="flex flex-col">
+      {/* Block header — clickable */}
+      <button
+        id={`block-row-${blockName.replace(/\s+/g, '-').toLowerCase()}`}
+        onClick={() => setOpen(p => !p)}
+        className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer border group ${
+          open
+            ? dk ? 'border-slate-700 bg-[#1e293b]' : 'border-slate-200 bg-slate-50'
+            : dk ? 'border-transparent hover:border-slate-700/60 hover:bg-[#1e293b]/60' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50 bg-white'
+        }`}
+        style={open ? { borderColor: `${glow}50`, background: `${glow}10` } : undefined}
+        aria-expanded={open}
+      >
+        {/* Left accent bar */}
+        <div
+          className="w-1 h-8 rounded-full flex-shrink-0 transition-all duration-300"
+          style={{ background: open ? glow : `${glow}40` }}
+        />
+
+        {/* Block name + school count */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-[13px] font-extrabold leading-tight truncate transition-colors ${
+            open ? '' : (dk ? 'text-slate-300' : 'text-slate-700')
+          }`} style={open ? { color: glow } : undefined}>
+            {blockName}
+          </p>
+          <p className={`text-[10px] font-semibold uppercase tracking-widest mt-0.5 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
+            {schools.length} {schools.length === 1 ? 'School' : 'Schools'}
+          </p>
+        </div>
+
+        {/* School count badge */}
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-black transition-all duration-200"
+          style={{ background: `${glow}25`, color: glow, border: `1px solid ${glow}40` }}
+        >
+          {schools.length}
+        </div>
+
+        {/* Chevron */}
+        <ChevronDown
+          size={14}
+          className={`flex-shrink-0 transition-transform duration-300 ml-1 ${open ? 'rotate-180' : ''} ${dk ? 'text-slate-500' : 'text-slate-400'}`}
+          style={open ? { color: glow } : undefined}
+        />
+      </button>
+
+      {/* School list — expands under block */}
+      {open && (
+        <div className="ml-5 mt-1.5 mb-2.5 flex flex-col gap-1.5" style={{ borderLeft: `2px solid ${glow}40`, paddingLeft: '12px' }}>
+          {schools.map((school, si) => (
+            <div
+              key={school.id}
+              id={`school-item-${school.id}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 ${
+                dk
+                  ? 'bg-[#1e293b]/60 hover:bg-[#1e293b] border border-slate-800/60 hover:border-slate-700'
+                  : 'bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-sm'
+              }`}
+            >
+              <span
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0"
+                style={{ background: `${glow}20`, color: glow }}
+              >
+                {si + 1}
+              </span>
+              <p className={`text-[12px] font-bold leading-snug flex-1 min-w-0 ${dk ? 'text-slate-200' : 'text-slate-800'}`}>
+                {school.school_name}
+              </p>
+              <School size={12} className="flex-shrink-0 opacity-30" style={{ color: glow }} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function RightPanel({ selectedDistrict, onClearDistrict }: RightPanelProps) {
   const { setMetric, selectedMetric, theme } = useDashboardStore();
   const [schools, setSchools] = useState<VetriSchool[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
-  const [schoolsExpanded, setSchoolsExpanded] = useState(true);
+  // 'schools' | 'tntet'
+  const [activeTab, setActiveTab] = useState<'schools' | 'tntet'>('schools');
 
   const dk = theme === 'dark';
 
@@ -58,11 +154,23 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
     if (!selectedDistrict) { setSchools([]); return; }
     let alive = true;
     setSchoolsLoading(true);
+    setActiveTab('schools'); // reset tab on district change
     fetchVetriSchools(selectedDistrict.id)
       .then(d => { if (alive) { setSchools(d); setSchoolsLoading(false); } })
       .catch(() => { if (alive) { setSchools([]); setSchoolsLoading(false); } });
     return () => { alive = false; };
   }, [selectedDistrict]);
+
+  // Group schools by block_name
+  const blockGroups = useMemo(() => {
+    const map = new Map<string, VetriSchool[]>();
+    for (const s of schools) {
+      const list = map.get(s.block_name) ?? [];
+      list.push(s);
+      map.set(s.block_name, list);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [schools]);
 
   /* ── Empty State ── */
   if (!selectedDistrict) {
@@ -134,54 +242,74 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
   ];
 
   return (
-    <aside className={`hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${dk ? 'bg-[#0f172a] border-[#1e293b]' : 'bg-white border-[#e2e8f0]'}`}
-      style={{ scrollbarWidth: 'thin', scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent' }}>
+    <aside
+      className={`hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${dk ? 'bg-[#0a0f1e] border-[#1e293b]' : 'border-[#e2e8f0]'}`}
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent',
+        background: dk ? '#0a0f1e' : 'linear-gradient(180deg, #f8faff 0%, #f1f5fd 100%)',
+      }}
+    >
 
       {/* ══════════════════════════════════════════
-          HERO HEADER — District Banner
+          HERO HEADER — Premium District Banner
       ══════════════════════════════════════════ */}
-      <div className={`relative overflow-hidden flex-shrink-0 px-5 pt-5 pb-6 border-b transition-all duration-300 ${dk ? 'border-[#1e293b] bg-gradient-to-br from-[#0f172a] via-[#0f172a] to-[#1a0f2e]' : 'border-[#e2e8f0] bg-gradient-to-br from-white via-white to-indigo-50/60'}`}>
-        {/* Decorative blurred orb */}
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-20 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
+      <div
+        className="relative overflow-hidden flex-shrink-0 px-5 pt-5 pb-6 border-b"
+        style={{
+          borderColor: dk ? '#1e293b' : 'rgba(99,102,241,0.15)',
+          background: dk
+            ? 'linear-gradient(135deg, #0f172a 0%, #1a0f2e 50%, #0f172a 100%)'
+            : 'linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #7c3aed 100%)',
+        }}
+      >
+        {/* Decorative orbs */}
+        <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-30 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #a78bfa, transparent)' }} />
+        <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #818cf8, transparent)' }} />
 
         {/* Top row: label + close */}
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${dk ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-600'}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" style={{ boxShadow: '0 0 6px rgba(129,140,248,0.8)' }} />
+        <div className="flex items-center justify-between mb-5 relative z-10">
+          <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.9)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" style={{ boxShadow: '0 0 6px rgba(255,255,255,0.8)' }} />
             District Profile
           </div>
           <button onClick={onClearDistrict}
-            className={`p-1.5 rounded-lg cursor-pointer transition-all duration-200 hover:rotate-90 ${dk ? 'text-slate-500 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'}`}
+            className="p-1.5 rounded-lg cursor-pointer transition-all duration-200 hover:rotate-90 hover:bg-white/20"
+            style={{ color: 'rgba(255,255,255,0.7)' }}
             aria-label="Clear selection">
             <X size={15} strokeWidth={2.5} />
           </button>
         </div>
 
         {/* District name + score ring */}
-        <div className="flex items-end justify-between gap-3 relative z-10">
+        <div className="flex items-center justify-between gap-3 relative z-10">
           <div className="flex-1 min-w-0">
-            <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>Tamil Nadu</p>
-            <h2 className={`text-[20px] font-black tracking-tight leading-tight ${dk ? 'text-white' : 'text-slate-900'}`}>
+            <p className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.55)' }}>Tamil Nadu</p>
+            <h2 className="text-[24px] font-black tracking-tight leading-tight text-white drop-shadow-sm">
               {districtName}
             </h2>
-            <div className="flex items-center gap-2 mt-2.5">
-              <div className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" style={{ background: `${scoreColor}20`, color: scoreColor, border: `1px solid ${scoreColor}40` }}>
+            <div className="flex items-center gap-2 mt-3">
+              <div className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider"
+                style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
                 {scoreLabel}
               </div>
-              <span className={`text-[10px] font-semibold ${dk ? 'text-slate-500' : 'text-slate-400'}`}>
-                {metrics?.active_blocks || 0} active blocks
+              <span className="text-[10px] font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                {metrics?.active_blocks || 0} blocks
               </span>
             </div>
           </div>
 
-          {/* Radial Gauge */}
+          {/* Score ring */}
           <div className="relative flex-shrink-0 flex flex-col items-center">
-            <div className="relative w-14 h-14 flex items-center justify-center">
-              <RadialGauge value={avgScore} color={scoreColor} size={56} />
-              <span className="absolute text-[12px] font-black" style={{ color: scoreColor }}>{avgScore}%</span>
+            <div className="relative w-16 h-16 flex items-center justify-center rounded-full"
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <RadialGauge value={avgScore} color="#ffffff" size={56} />
+              <span className="absolute text-[13px] font-black text-white">{avgScore}%</span>
             </div>
-            <span className={`text-[8px] font-bold uppercase tracking-widest mt-1 ${dk ? 'text-slate-500' : 'text-slate-400'}`}>Avg Score</span>
+            <span className="text-[8px] font-bold uppercase tracking-widest mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>Score</span>
           </div>
         </div>
       </div>
@@ -193,19 +321,21 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
         {sections.map((section) => {
           const sectionAccent = ACCENT_COLORS[section.color] || ACCENT_COLORS.blue;
           return (
-            <div key={section.title} className={`border-b transition-all duration-300 ${dk ? 'border-[#1e293b]' : 'border-[#f1f5f9]'}`}>
+            <div key={section.title} className={`border-b transition-all duration-300 ${dk ? 'border-[#1e293b]' : 'border-indigo-100/60'}`}>
               {/* Section header */}
-              <div className={`px-5 pt-4 pb-2 flex items-center gap-2`}>
-                <div className="p-1 rounded-md" style={{ background: `${sectionAccent.hex}18`, color: sectionAccent.hex }}>
+              <div className="px-5 pt-5 pb-2 flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${sectionAccent.hex}18`, color: sectionAccent.hex }}>
                   {section.icon}
                 </div>
                 <span className={`text-[10px] font-extrabold uppercase tracking-widest ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
                   {section.title}
                 </span>
+                <div className="flex-1 h-px" style={{ background: dk ? 'rgba(255,255,255,0.04)' : `${sectionAccent.hex}20` }} />
               </div>
 
               {/* Metrics in this section */}
-              <div className="px-4 pb-4 flex flex-col gap-1.5">
+              <div className="px-4 pb-4 flex flex-col gap-2">
                 {section.metrics.map((m) => {
                   const isActive = selectedMetric === m.key;
                   const ac = ACCENT_COLORS[m.color] || ACCENT_COLORS.blue;
@@ -214,53 +344,58 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                   return (
                     <button
                       key={m.key}
+                      id={`metric-btn-${m.key}`}
                       onClick={() => setMetric(m.key as any)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 cursor-pointer group border ${
-                        isActive
-                          ? `border-transparent`
-                          : dk
-                            ? 'border-transparent hover:border-slate-700/60 hover:bg-[#1e293b]/60'
-                            : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
-                      }`}
+                      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left transition-all duration-200 cursor-pointer group"
                       style={isActive ? {
-                        background: `linear-gradient(135deg, ${ac.hex}15, ${ac.hex}08)`,
-                        border: `1px solid ${ac.hex}35`,
-                        boxShadow: `0 2px 12px ${ac.hex}18`,
-                      } : undefined}
+                        background: dk
+                          ? `linear-gradient(135deg, ${ac.hex}20, ${ac.hex}10)`
+                          : `linear-gradient(135deg, ${ac.hex}12, ${ac.hex}06)`,
+                        border: `1.5px solid ${ac.hex}40`,
+                        boxShadow: `0 4px 20px ${ac.hex}20`,
+                      } : {
+                        background: dk ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.85)',
+                        border: dk ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(99,102,241,0.1)',
+                        boxShadow: dk ? 'none' : '0 1px 4px rgba(99,102,241,0.08)',
+                      }}
                     >
                       {/* Icon */}
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200`}
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200"
                         style={{
-                          background: isActive ? ac.hex : (dk ? '#1e293b' : ac.light),
+                          background: isActive ? ac.hex : (dk ? 'rgba(255,255,255,0.06)' : ac.light),
                           color: isActive ? '#fff' : ac.hex,
-                          boxShadow: isActive ? `0 4px 12px ${ac.hex}40` : 'none',
-                        }}>
+                          boxShadow: isActive ? `0 4px 14px ${ac.hex}50` : 'none',
+                        }}
+                      >
                         {m.icon}
                       </div>
 
                       {/* Label + value */}
                       <div className="flex-1 min-w-0">
-                        <div className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${isActive ? '' : (dk ? 'text-slate-400' : 'text-slate-500')}`}
-                          style={isActive ? { color: ac.hex } : {}}>
+                        <div
+                          className="text-[10px] font-bold uppercase tracking-wider"
+                          style={{ color: isActive ? ac.hex : (dk ? 'rgba(148,163,184,0.8)' : 'rgba(100,116,139,0.9)') }}
+                        >
                           {m.label}
                         </div>
                         <div
-                          className={`text-[16px] font-black tracking-tight leading-tight mt-0.5 transition-colors ${!isActive ? (dk ? 'text-slate-100' : 'text-slate-900') : ''}`}
-                          style={isActive ? { color: dk ? '#ffffff' : ac.hex } : {}}
+                          className="text-[18px] font-black tracking-tight leading-tight mt-0.5"
+                          style={{ color: isActive ? (dk ? '#fff' : ac.hex) : (dk ? '#f1f5f9' : '#0f172a') }}
                         >
                           {numVal !== null ? `${numVal}%` : m.value}
                         </div>
                       </div>
 
                       {/* Gauge or chevron */}
-                      <div className="flex-shrink-0 flex items-center justify-center">
+                      <div className="flex-shrink-0">
                         {numVal !== null ? (
-                          <RadialGauge value={numVal} color={isActive ? (dk ? '#ffffff' : ac.hex) : ac.hex} size={32} />
+                          <RadialGauge value={numVal} color={isActive ? (dk ? '#fff' : ac.hex) : ac.hex} size={34} />
                         ) : (
                           <ChevronRight
                             size={14}
-                            style={isActive ? { color: dk ? '#ffffff' : ac.hex } : {}}
-                            className={`transition-all duration-200 ${!isActive ? (dk ? 'text-slate-600' : 'text-slate-300') : ''} group-hover:translate-x-0.5`}
+                            className="transition-transform duration-200 group-hover:translate-x-0.5"
+                            style={{ color: isActive ? (dk ? '#fff' : ac.hex) : (dk ? 'rgba(100,116,139,0.6)' : 'rgba(148,163,184,0.8)') }}
                           />
                         )}
                       </div>
@@ -273,22 +408,23 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
         })}
 
         {/* ══════════════════════════════════════════
-            VETRI PALLIGAL COACHING CENTRES
+            VETRI PALLIGAL — BLOCK DRILL-DOWN
         ══════════════════════════════════════════ */}
-        <div className="flex flex-col">
+        <div className="flex flex-col pb-6">
 
           {/* ── Section Banner ── */}
           <div className={`relative overflow-hidden mx-4 mt-4 mb-3 rounded-2xl p-4 border ${
-            dk ? 'border-purple-500/20 bg-gradient-to-br from-purple-900/30 via-[#1a0f2e]/60 to-indigo-900/20' 
+            dk ? 'border-purple-500/20 bg-gradient-to-br from-purple-900/30 via-[#1a0f2e]/60 to-indigo-900/20'
                : 'border-purple-200/60 bg-gradient-to-br from-purple-50 via-white to-indigo-50'
           }`}>
             {/* Decorative blurred orb */}
             <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-30 pointer-events-none"
               style={{ background: 'radial-gradient(circle, #a855f7, transparent)' }} />
 
-            <div className="relative z-10 flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
+            <div className="relative z-10">
+              {/* Title row */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-purple-500/20 flex items-center justify-center">
                     <GraduationCap size={13} className="text-purple-400" />
                   </div>
@@ -296,117 +432,83 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                     Vetri Palligal
                   </span>
                 </div>
-                <div className={`text-[22px] font-black leading-none ${dk ? 'text-white' : 'text-slate-900'}`}>
-                  {schoolsLoading ? '…' : schools.length}
-                </div>
-                <div className={`text-[10px] font-semibold mt-0.5 ${dk ? 'text-purple-300/70' : 'text-purple-500'}`}>
-                  Coaching Centres
+                <div className="flex flex-col items-end">
+                  <div className={`text-[18px] font-black leading-none ${dk ? 'text-white' : 'text-slate-900'}`}>
+                    {schoolsLoading ? '…' : schools.length}
+                  </div>
+                  <div className={`text-[9px] font-semibold ${dk ? 'text-purple-300/70' : 'text-purple-500'}`}>
+                    Coaching Centres
+                  </div>
                 </div>
               </div>
-              <button
-                onClick={() => setSchoolsExpanded(p => !p)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border cursor-pointer transition-all duration-200 ${
-                  schoolsExpanded
-                    ? dk ? 'bg-purple-500/20 border-purple-500/30 text-purple-300' : 'bg-purple-100 border-purple-300 text-purple-700'
-                    : dk ? 'bg-[#1e293b] border-slate-700 text-slate-400 hover:border-purple-500/30 hover:text-purple-300' : 'bg-white border-slate-200 text-slate-500 hover:border-purple-300 hover:text-purple-600'
-                }`}
+
+              {/* ── Schools / TNTET Toggle ── */}
+              <div
+                id="vetri-tab-toggle"
+                className={`flex rounded-xl p-0.5 gap-0.5 ${dk ? 'bg-[#0f172a]/60' : 'bg-slate-100'}`}
               >
-                <ChevronRight size={11} className={`transition-transform duration-300 ${schoolsExpanded ? 'rotate-90' : ''}`} />
-                {schoolsExpanded ? 'Collapse' : 'Expand'}
-              </button>
+                <button
+                  id="tab-schools"
+                  onClick={() => setActiveTab('schools')}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    activeTab === 'schools'
+                      ? dk ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-purple-700 shadow-sm border border-purple-200'
+                      : dk ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  <School size={10} />
+                  Schools
+                </button>
+                <button
+                  id="tab-tntet"
+                  onClick={() => setActiveTab('tntet')}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    activeTab === 'tntet'
+                      ? dk ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-indigo-700 shadow-sm border border-indigo-200'
+                      : dk ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  <BookMarked size={10} />
+                  TNTET
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* ── School Cards ── */}
-          {schoolsExpanded && (
-            <div className="px-4 pb-6">
+          {/* ── TAB: Schools (Block → School drill-down) ── */}
+          {activeTab === 'schools' && (
+            <div className="px-4">
               {schoolsLoading ? (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className={`h-[70px] rounded-2xl animate-pulse ${dk ? 'bg-[#1e293b]/60' : 'bg-slate-100'}`} />
+                    <div key={i} className={`h-14 rounded-xl animate-pulse ${dk ? 'bg-[#1e293b]/60' : 'bg-slate-100'}`} />
                   ))}
                 </div>
-              ) : schools.length > 0 ? (
-                <div className="flex flex-col gap-2.5">
-                  {schools.map((school, idx) => {
-                    /* Cycle through accent colours per card for variety */
-                    const hues = ['#6366f1','#a855f7','#ec4899','#14b8a6','#3b82f6','#f59e0b'];
-                    const glow = hues[idx % hues.length];
-                    return (
-                      <div
-                        key={school.id}
-                        className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-default ${
-                          dk
-                            ? 'bg-gradient-to-r from-[#1e293b]/70 to-[#1e293b]/40 border-slate-800/50 hover:border-slate-600/60'
-                            : 'bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-md'
-                        }`}
-                        style={{
-                          boxShadow: dk ? `0 0 0 0 ${glow}` : undefined,
-                        }}
-                        onMouseEnter={e => {
-                          if (dk) (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${glow}22, inset 0 0 0 1px ${glow}30`;
-                        }}
-                        onMouseLeave={e => {
-                          if (dk) (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 0 ${glow}`;
-                        }}
-                      >
-                        {/* Left accent bar */}
-                        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full opacity-70"
-                          style={{ background: glow }} />
+              ) : blockGroups.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {blockGroups.map(([blockName, blockSchools], idx) => (
+                    <BlockRow
+                      key={blockName}
+                      blockName={blockName}
+                      schools={blockSchools}
+                      idx={idx}
+                      dk={dk}
+                    />
+                  ))}
 
-                        {/* Subtle top-right shimmer on hover */}
-                        <div className="absolute top-0 right-0 w-20 h-20 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                          style={{ background: glow }} />
-
-                        <div className="flex items-center gap-3 px-4 py-3 pl-5">
-                          {/* Index badge with glow */}
-                          <div
-                            className="w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
-                            style={{
-                              background: `${glow}22`,
-                              color: glow,
-                              border: `1px solid ${glow}40`,
-                              boxShadow: `0 2px 8px ${glow}20`,
-                            }}
-                          >
-                            {idx + 1}
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[12px] font-bold leading-tight transition-colors duration-200 ${
-                              dk ? 'text-slate-200 group-hover:text-white' : 'text-slate-800 group-hover:text-slate-950'
-                            }`}>
-                              {school.school_name}
-                            </p>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md"
-                                style={{ background: `${glow}15`, border: `1px solid ${glow}25` }}>
-                                <MapPin size={8} style={{ color: glow }} />
-                                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: glow }}>
-                                  {school.block_name}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Subtle school icon on the right */}
-                          <School
-                            size={16}
-                            className="flex-shrink-0 transition-all duration-300 opacity-20 group-hover:opacity-50"
-                            style={{ color: glow }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {/* Bottom summary pill */}
-                  <div className={`mt-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed text-[10px] font-bold uppercase tracking-widest ${
-                    dk ? 'border-slate-800/60 text-slate-600' : 'border-slate-200 text-slate-400'
+                  {/* Summary pill */}
+                  <div className={`mt-1 flex items-center justify-center gap-3 py-3 rounded-2xl border border-dashed ${
+                    dk ? 'border-slate-800/60' : 'border-slate-200'
                   }`}>
-                    <GraduationCap size={12} className="text-purple-400 opacity-60" />
-                    {schools.length} Vetri Palligal {schools.length === 1 ? 'Centre' : 'Centres'}
+                    <div className="flex items-center gap-1.5">
+                      <Layers size={11} className={dk ? 'text-amber-400/60' : 'text-amber-500/60'} />
+                      <span className={`text-[10px] font-bold uppercase tracking-widest ${dk ? 'text-slate-500' : 'text-slate-400'}`}>{blockGroups.length} Blocks</span>
+                    </div>
+                    <div className={`w-px h-3 ${dk ? 'bg-slate-700' : 'bg-slate-200'}`} />
+                    <div className="flex items-center gap-1.5">
+                      <GraduationCap size={11} className="text-purple-400/60" />
+                      <span className={`text-[10px] font-bold uppercase tracking-widest ${dk ? 'text-slate-500' : 'text-slate-400'}`}>{schools.length} Centres</span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -429,9 +531,40 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
               )}
             </div>
           )}
+
+          {/* ── TAB: TNTET Candidates (placeholder) ── */}
+          {activeTab === 'tntet' && (
+            <div className="px-4">
+              <div className={`relative overflow-hidden flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed text-center ${
+                dk ? 'bg-[#1e293b]/20 border-indigo-800/30' : 'bg-indigo-50/40 border-indigo-200'
+              }`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none rounded-2xl" />
+                <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
+                  dk ? 'bg-indigo-900/40 border border-indigo-800/50' : 'bg-indigo-100 border border-indigo-200'
+                }`}>
+                  <BookMarked size={24} strokeWidth={1.5} className={dk ? 'text-indigo-400' : 'text-indigo-400'} />
+                </div>
+                <div className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3 ${
+                  dk ? 'bg-indigo-900/50 text-indigo-400 border border-indigo-700/40' : 'bg-indigo-100 text-indigo-600 border border-indigo-200'
+                }`}>
+                  Data Pending
+                </div>
+                <p className={`text-[11px] font-black uppercase tracking-widest mb-1.5 ${dk ? 'text-slate-400' : 'text-slate-600'}`}>
+                  TNTET Candidates
+                </p>
+                <p className={`text-[10px] leading-relaxed max-w-[190px] ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
+                  TNTET candidate data for this district has not yet been provided. This view will be enabled once data is available.
+                </p>
+                <div className={`mt-4 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
+                  <ToggleLeft size={12} />
+                  Coming in a future update
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </aside>
   );
 }
-

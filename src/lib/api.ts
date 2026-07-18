@@ -51,6 +51,46 @@ export async function fetchDistricts(): Promise<District[]> {
   }
 }
 
+// ─── Vetri Palligal Blocks ───────────────────────────────────────────────────
+
+export interface VetriBlock {
+  district_id: number;
+  block_name: string;
+  school_count: number;
+}
+
+/**
+ * Fetch distinct blocks for a given district, with school counts.
+ * Derived from the vetri_schools table by grouping on block_name.
+ * Falls back to an empty array on error.
+ */
+export async function fetchVetriBlocks(districtId: number): Promise<VetriBlock[]> {
+  try {
+    const { data, error } = await supabase
+      .from('vetri_schools')
+      .select('district_id, block_name')
+      .eq('district_id', districtId)
+      .order('block_name', { ascending: true });
+
+    if (error) throw error;
+    if (!data || data.length === 0) return [];
+
+    // Group by block_name on the client side
+    const blockMap = new Map<string, number>();
+    for (const row of data) {
+      blockMap.set(row.block_name, (blockMap.get(row.block_name) ?? 0) + 1);
+    }
+    return Array.from(blockMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([block_name, school_count]) => ({ district_id: districtId, block_name, school_count }));
+  } catch (error) {
+    console.error(`Failed to fetch Vetri blocks for district ${districtId}:`, error);
+    return [];
+  }
+}
+
+
+
 // ─── Vetri Palligal Schools ──────────────────────────────────────────────────
 
 export interface VetriSchool {

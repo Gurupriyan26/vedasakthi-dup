@@ -28,6 +28,14 @@ export interface DistrictMetrics {
   updated_at: string;
 }
 
+// ─── Vetri Palligal ──────────────────────────────────────────────────────────
+
+export interface VetriBlock {
+  district_id: number;
+  block_name: string;
+  school_count: number;
+}
+
 // ─── GeoJSON ─────────────────────────────────────────────────────────────────
 
 export interface DistrictGeoProperties {
