@@ -70,8 +70,8 @@ function BlockRow({
         onClick={() => setOpen(p => !p)}
         className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer border group ${
           open
-            ? dk ? 'border-slate-700 bg-[#1e293b]' : 'border-slate-200 bg-slate-50'
-            : dk ? 'border-transparent hover:border-slate-700/60 hover:bg-[#1e293b]/60' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50 bg-white'
+            ? dk ? 'border-slate-700 bg-[#1e293b]' : 'border-slate-300 bg-slate-50'
+            : dk ? 'border-transparent hover:border-slate-700/60 hover:bg-[#1e293b]/60' : 'border-slate-200/80 hover:border-slate-300 hover:bg-slate-50 bg-[#f8fafc]'
         }`}
         style={open ? { borderColor: `${glow}50`, background: `${glow}10` } : undefined}
         aria-expanded={open}
@@ -252,12 +252,12 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
         className={`flex flex-col z-50 xl:z-20 overflow-y-auto transition-all duration-300
           fixed bottom-0 left-0 right-0 w-full h-[78vh] max-h-[85vh] rounded-t-[28px] border-t border-x-0 shadow-[0_-12px_40px_rgba(0,0,0,0.15)]
           xl:relative xl:bottom-auto xl:left-auto xl:right-auto xl:w-[360px] xl:h-full xl:rounded-none xl:border-l xl:border-t-0 xl:shadow-none
-          ${dk ? 'bg-[#0a0f1e] border-[#1e293b]' : 'border-[#e2e8f0]'}
+          ${dk ? 'bg-[#0a0f1e] border-[#1e293b]' : 'bg-[#ffffff] border-[#e2e8f0]'}
         `}
         style={{
           scrollbarWidth: 'thin',
           scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent',
-          background: dk ? '#0a0f1e' : 'linear-gradient(180deg, #f8faff 0%, #f1f5fd 100%)',
+          background: dk ? '#0a0f1e' : '#ffffff',
         }}
       >
         {/* Drag handle for mobile bottom sheet */}
@@ -366,9 +366,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                         border: `1.5px solid ${ac.hex}40`,
                         boxShadow: `0 4px 20px ${ac.hex}20`,
                       } : {
-                        background: dk ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.85)',
-                        border: dk ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(99,102,241,0.1)',
-                        boxShadow: dk ? 'none' : '0 1px 4px rgba(99,102,241,0.08)',
+                        background: dk ? 'rgba(30,41,59,0.5)' : '#f8fafc',
+                        border: dk ? '1px solid rgba(255,255,255,0.05)' : '1px solid #e2e8f0',
+                        boxShadow: dk ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
                       }}
                     >
                       {/* Icon */}
