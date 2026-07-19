@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCharts, setShowCharts] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme } = useDashboardStore();
 
   useEffect(() => { setMounted(true); }, []);
@@ -75,14 +76,17 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex flex-1 overflow-hidden">
-          <div style={{ width: 320, background: 'var(--surface)', borderRight: '1px solid var(--border)', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div 
+            className="hidden lg:flex flex-col gap-3 p-4 flex-shrink-0"
+            style={{ width: 320, background: 'var(--surface)', borderRight: '1px solid var(--border)' }}
+          >
             <div className="skeleton h-24 rounded-xl" />
             <div className="grid grid-cols-2 gap-2">
               {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-20 rounded-xl" />)}
             </div>
           </div>
           <div className="flex-1 skeleton m-3 rounded-2xl" />
-          <div style={{ width: 300, background: 'var(--surface)', borderLeft: '1px solid var(--border)' }} />
+          <div className="hidden xl:block flex-shrink-0" style={{ width: 300, background: 'var(--surface)', borderLeft: '1px solid var(--border)' }} />
         </div>
       </div>
     );
@@ -99,10 +103,21 @@ export default function DashboardPage() {
         ['--border' as any]: theme === 'dark' ? '#1e293b' : '#e0e6ed',
       }}
     >
-      <Header loading={loading} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Header 
+        loading={loading} 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery} 
+        onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        isSidebarOpen={isSidebarOpen}
+      />
 
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar districts={filteredDistricts} loading={loading} />
+      <div className="flex flex-1 overflow-hidden relative">
+        <Sidebar 
+          districts={filteredDistricts} 
+          loading={loading} 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
         <main className="flex-1 flex flex-col overflow-hidden">
           {error ? (

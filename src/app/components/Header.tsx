@@ -1,27 +1,48 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, X, Activity, Sun, Moon } from 'lucide-react';
+import { Search, X, Activity, Sun, Moon, Menu } from 'lucide-react';
 import { useDashboardStore } from '@/store/useDashboardStore';
 
 interface HeaderProps {
   loading: boolean;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  onToggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
 }
 
-export default function Header({ loading, searchQuery = '', onSearchChange }: HeaderProps) {
+export default function Header({ 
+  loading, 
+  searchQuery = '', 
+  onSearchChange,
+  onToggleSidebar,
+  isSidebarOpen 
+}: HeaderProps) {
   const [focused, setFocused] = useState(false);
   const { theme, toggleTheme } = useDashboardStore();
 
   return (
-    <header className={`flex-shrink-0 backdrop-blur-md px-6 py-3 flex justify-between items-center z-50 shadow-sm border-b transition-all duration-300 ${
+    <header className={`flex-shrink-0 backdrop-blur-md px-4 sm:px-6 py-3 flex justify-between items-center z-50 shadow-sm border-b transition-all duration-300 ${
       theme === 'dark'
         ? 'bg-[#0f172a]/90 border-[#1e293b] text-white'
         : 'bg-white/80 border-slate-200/80 text-slate-900'
     }`}>
-      {/* Brand Logo & Title */}
-      <div className="flex items-center gap-3.5">
+      {/* Mobile Toggle & Brand Logo */}
+      <div className="flex items-center gap-3">
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            className={`lg:hidden p-2 rounded-xl transition-all duration-300 flex items-center justify-center border shadow-sm cursor-pointer hover:scale-105 active:scale-95 mr-1 ${
+              theme === 'dark'
+                ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-750'
+                : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200/60'
+            }`}
+            aria-label="Toggle Sidebar"
+          >
+            <Menu size={18} strokeWidth={2.5} />
+          </button>
+        )}
         <div className={`relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg border overflow-hidden group hover:scale-105 transition-transform duration-300 ${
           theme === 'dark' ? 'border-[#1e293b]' : 'border-slate-700'
         }`}>
@@ -131,7 +152,7 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
           {theme === 'dark' ? <Sun size={15} strokeWidth={2.5} /> : <Moon size={15} strokeWidth={2.5} />}
         </button>
 
-        <div className={`flex items-center gap-2.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full border transition-all duration-300 cursor-default shadow-sm ${
+        <div className={`flex items-center gap-2.5 text-[10px] font-bold tracking-widest uppercase px-2.5 sm:px-4 py-2 rounded-full border transition-all duration-300 cursor-default shadow-sm ${
           theme === 'dark'
             ? 'bg-slate-800 text-slate-400 border-slate-700'
             : 'bg-slate-100 text-slate-500 border-slate-200'
@@ -139,7 +160,7 @@ export default function Header({ loading, searchQuery = '', onSearchChange }: He
           <div className="relative flex items-center justify-center w-2 h-2">
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
           </div>
-          Preview Mode
+          <span className="hidden sm:inline">Preview Mode</span>
         </div>
       </div>
     </header>

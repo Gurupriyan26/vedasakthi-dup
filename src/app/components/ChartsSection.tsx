@@ -82,9 +82,9 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
 
   return (
-    <div className="flex flex-col xl:flex-row p-3 bg-transparent">
+    <div className="flex flex-col xl:flex-row p-2 sm:p-3 bg-transparent">
       {/* ── Bar Chart ── */}
-      <div className={`flex-1 rounded-xl p-4 min-h-[120px] border shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
+      <div className={`flex-1 rounded-xl p-3 sm:p-4 min-h-[120px] border shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
         theme === 'dark'
           ? 'bg-[#0f172a]/85 border-[#1e293b]'
           : 'bg-white/50 border-white/60'
@@ -92,14 +92,14 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
         
-        <div className={`text-[10px] font-black uppercase tracking-widest mb-5 relative z-10 transition-colors duration-300 ${
+        <div className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-4 sm:mb-5 pr-8 relative z-10 transition-colors duration-300 ${
           theme === 'dark' ? 'text-slate-400' : 'text-slate-450'
         }`}>
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[140px]">
+        <div className="relative z-10 w-full h-[120px] sm:h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 20, right: 5, left: -25, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#e2e8f0'} />
               <XAxis
                 dataKey="name"

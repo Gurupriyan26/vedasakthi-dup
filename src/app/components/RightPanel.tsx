@@ -242,14 +242,26 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
   ];
 
   return (
-    <aside
-      className={`hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l h-full overflow-y-auto z-20 transition-all duration-300 ${dk ? 'bg-[#0a0f1e] border-[#1e293b]' : 'border-[#e2e8f0]'}`}
-      style={{
-        scrollbarWidth: 'thin',
-        scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent',
-        background: dk ? '#0a0f1e' : 'linear-gradient(180deg, #f8faff 0%, #f1f5fd 100%)',
-      }}
-    >
+    <>
+      {/* Mobile Backdrop overlay for bottom sheet */}
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 xl:hidden transition-opacity duration-300"
+        onClick={onClearDistrict}
+      />
+      <aside
+        className={`flex flex-col z-50 xl:z-20 overflow-y-auto transition-all duration-300
+          fixed bottom-0 left-0 right-0 w-full h-[78vh] max-h-[85vh] rounded-t-[28px] border-t border-x-0 shadow-[0_-12px_40px_rgba(0,0,0,0.15)]
+          xl:relative xl:bottom-auto xl:left-auto xl:right-auto xl:w-[360px] xl:h-full xl:rounded-none xl:border-l xl:border-t-0 xl:shadow-none
+          ${dk ? 'bg-[#0a0f1e] border-[#1e293b]' : 'border-[#e2e8f0]'}
+        `}
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: dk ? '#334155 transparent' : '#cbd5e1 transparent',
+          background: dk ? '#0a0f1e' : 'linear-gradient(180deg, #f8faff 0%, #f1f5fd 100%)',
+        }}
+      >
+        {/* Drag handle for mobile bottom sheet */}
+        <div className="xl:hidden w-12 h-1 bg-slate-350 dark:bg-slate-750 rounded-full mx-auto mt-3.5 mb-1.5 flex-shrink-0" />
 
       {/* ══════════════════════════════════════════
           HERO HEADER — Premium District Banner
@@ -566,5 +578,6 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
         </div>
       </div>
     </aside>
+  </>
   );
 }

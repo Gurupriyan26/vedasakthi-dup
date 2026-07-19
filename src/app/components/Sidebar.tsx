@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Map as MapIcon, TrendingUp } from 'lucide-react';
+import { School, UserCheck, GraduationCap, FlaskConical, Users, Zap, Droplet, Map as MapIcon, TrendingUp, X } from 'lucide-react';
 import { useDashboardStore, MetricType } from '@/store/useDashboardStore';
 import { District } from '@/types';
 
@@ -21,9 +21,11 @@ const getMetricColor = (color: string) => {
 interface SidebarProps {
   districts: District[];
   loading: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function Sidebar({ districts, loading }: SidebarProps) {
+export default function Sidebar({ districts, loading, isOpen = false, onClose }: SidebarProps) {
   const { selectedMetric, setMetric, theme } = useDashboardStore();
 
   const computedMetrics = useMemo(() => {
@@ -131,115 +133,141 @@ export default function Sidebar({ districts, loading }: SidebarProps) {
   ], [computedMetrics]);
 
   return (
-    <aside
-      className="flex flex-col h-full flex-shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300"
-      style={{ 
-        width: '350px', 
-        zIndex: 10, 
-        background: theme === 'dark' ? '#0f172a' : '#ffffff',
-        borderRight: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
-      }}
-    >
-      <div className="p-4">
-        
-        {/* ── Brand Logo Header ── */}
-        <div className="mb-6 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <TrendingUp size={18} strokeWidth={2.5} className="text-white" />
-          </div>
-          <div>
-            <h2 className={`text-[13px] font-black uppercase tracking-widest leading-tight transition-colors duration-300 ${
-              theme === 'dark' ? 'text-white' : 'text-slate-900'
-            }`}>TN Education</h2>
-            <p className={`text-[10px] font-bold tracking-widest uppercase transition-colors duration-300 ${
-              theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-            }`}>Dashboard Prototype</p>
-          </div>
-        </div>
-
-        {/* ── Instructions Banner ── */}
-        <div className={`mb-5 rounded-lg p-3 text-[11px] border flex items-center gap-2.5 shadow-inner transition-colors duration-300 ${
-          theme === 'dark' 
-            ? 'bg-[#1e293b] text-slate-300 border-slate-700/50' 
-            : 'bg-slate-50 text-slate-650 border-slate-200'
-        }`}>
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)] flex-shrink-0" />
-          <span className="leading-relaxed tracking-wide"><strong>DATA MODE:</strong> SELECT METRIC TO RENDER HEATMAP.</span>
-        </div>
-
-        {/* ── Compact Premium Dark Grid ── */}
-        <div className="grid grid-cols-2 gap-3">
-          {metricsList.map((m) => {
-            const isActive = selectedMetric === m.key;
-            const accent = getMetricColor(m.color);
-            return (
+    <>
+      {/* Mobile Backdrop overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 lg:hidden transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
+      <aside
+        className={`flex flex-col h-full flex-shrink-0 overflow-y-auto custom-scrollbar transition-transform lg:transition-none duration-300 
+          fixed lg:relative top-0 left-0 z-50 lg:z-10 w-[320px] sm:w-[350px] max-w-[85vw] lg:w-[350px]
+          ${isOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full lg:translate-x-0'}
+        `}
+        style={{ 
+          background: theme === 'dark' ? '#0f172a' : '#ffffff',
+          borderRight: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
+        }}
+      >
+        <div className="p-4">
+          
+          {/* ── Brand Logo Header ── */}
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <TrendingUp size={18} strokeWidth={2.5} className="text-white" />
+              </div>
+              <div>
+                <h2 className={`text-[13px] font-black uppercase tracking-widest leading-tight transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>TN Education</h2>
+                <p className={`text-[10px] font-bold tracking-widest uppercase transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                }`}>Dashboard Prototype</p>
+              </div>
+            </div>
+            {onClose && (
               <button
-                key={m.key}
-                onClick={() => setMetric(m.key)}
-                className={`
-                  relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
-                  ${isActive 
-                    ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
-                    : theme === 'dark'
-                      ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
-                      : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
-                  }
-                `}
-                style={{
-                  boxShadow: isActive ? `0 8px 24px -4px ${accent}40, 0 0 0 1.5px ${accent}` : undefined,
-                } as React.CSSProperties}
+                onClick={onClose}
+                className={`lg:hidden p-1.5 rounded-lg transition-all ${
+                  theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'
+                }`}
+                aria-label="Close menu"
               >
-                {/* Micro Gradient Background for Active State */}
-                {isActive && (
-                  <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${accent}30, transparent 70%)` }} />
-                )}
+                <X size={16} strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
 
-                <div className="flex flex-col h-full relative z-10 w-full">
-                  <div className="flex items-center justify-between w-full mb-2">
-                    <div 
-                      className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
-                        !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
-                      }`} 
-                      style={{ 
-                        backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
-                        color: isActive ? '#ffffff' : accent 
-                      }}
-                    >
-                      {m.icon}
+          {/* ── Instructions Banner ── */}
+          <div className={`mb-5 rounded-lg p-3 text-[11px] border flex items-center gap-2.5 shadow-inner transition-colors duration-300 ${
+            theme === 'dark' 
+              ? 'bg-[#1e293b] text-slate-300 border-slate-700/50' 
+              : 'bg-slate-50 text-slate-650 border-slate-200'
+          }`}>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)] flex-shrink-0" />
+            <span className="leading-relaxed tracking-wide"><strong>DATA MODE:</strong> SELECT METRIC TO RENDER HEATMAP.</span>
+          </div>
+
+          {/* ── Compact Premium Dark Grid ── */}
+          <div className="grid grid-cols-2 gap-3">
+            {metricsList.map((m) => {
+              const isActive = selectedMetric === m.key;
+              const accent = getMetricColor(m.color);
+              return (
+                <button
+                  key={m.key}
+                  onClick={() => {
+                    setMetric(m.key);
+                    if (onClose) onClose();
+                  }}
+                  className={`
+                    relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
+                    ${isActive 
+                      ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
+                      : theme === 'dark'
+                        ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
+                        : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
+                    }
+                  `}
+                  style={{
+                    boxShadow: isActive ? `0 8px 24px -4px ${accent}40, 0 0 0 1.5px ${accent}` : undefined,
+                  } as React.CSSProperties}
+                >
+                  {/* Micro Gradient Background for Active State */}
+                  {isActive && (
+                    <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${accent}30, transparent 70%)` }} />
+                  )}
+
+                  <div className="flex flex-col h-full relative z-10 w-full">
+                    <div className="flex items-center justify-between w-full mb-2">
+                      <div 
+                        className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
+                          !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
+                        }`} 
+                        style={{ 
+                          backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
+                          color: isActive ? '#ffffff' : accent 
+                        }}
+                      >
+                        {m.icon}
+                      </div>
+                      <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
+                        isActive 
+                          ? 'text-white' 
+                          : theme === 'dark'
+                            ? 'text-slate-200'
+                            : 'text-slate-900'
+                      }`}>
+                        {m.value}
+                      </span>
                     </div>
-                    <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
+                    
+                    <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-2 transition-colors duration-300 ${
                       isActive 
-                        ? 'text-white' 
+                        ? 'text-slate-200' 
                         : theme === 'dark'
-                          ? 'text-slate-200'
-                          : 'text-slate-900'
+                          ? 'text-slate-400'
+                          : 'text-slate-600'
                     }`}>
-                      {m.value}
+                      {m.label}
                     </span>
                   </div>
-                  
-                  <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-2 transition-colors duration-300 ${
-                    isActive 
-                      ? 'text-slate-200' 
-                      : theme === 'dark'
-                        ? 'text-slate-400'
-                        : 'text-slate-600'
-                  }`}>
-                    {m.label}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: ${theme === 'dark' ? '#334155' : '#cbd5e1'}; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: ${theme === 'dark' ? '#475569' : '#94a3b8'}; }
-      `}} />
-    </aside>
+        
+        <style dangerouslySetInnerHTML={{__html: `
+          .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+          .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+          .custom-scrollbar::-webkit-scrollbar-thumb { background: ${theme === 'dark' ? '#334155' : '#cbd5e1'}; border-radius: 10px; }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: ${theme === 'dark' ? '#475569' : '#94a3b8'}; }
+        `}} />
+      </aside>
+    </>
   );
 }
