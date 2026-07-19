@@ -119,13 +119,13 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                   fill: theme === 'dark' ? '#818cf8' : '#6366f1', 
                   fontSize: 10, 
                   fontWeight: 900,
-                  fontFamily: 'Inter, sans-serif'
+                  fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif"
                 }} 
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: theme === 'dark' ? '#94a3b8' : '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+                tick={{ fontSize: 11, fill: theme === 'dark' ? '#94a3b8' : '#64748b', fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif", fontWeight: 600 }}
               />
               <Tooltip
                 cursor={{ fill: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : '#f8fafc' }}
@@ -133,7 +133,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                   background: theme === 'dark' ? '#0f172a' : '#ffffff',
                   borderRadius: '12px',
                   border: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
-                  fontFamily: 'Inter, sans-serif',
+                  fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif",
                   fontSize: '12px',
                   color: theme === 'dark' ? '#ffffff' : '#1e293b',
                   padding: '14px',
