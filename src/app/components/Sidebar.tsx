@@ -208,12 +208,12 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                     ${isActive 
                       ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
                       : theme === 'dark'
-                        ? 'bg-[#1e293b] border-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-600 hover:-translate-y-0.5'
-                        : 'bg-slate-50 border-slate-200 shadow-sm hover:shadow-md hover:border-slate-350 hover:bg-slate-100/50 hover:-translate-y-0.5'
+                        ? 'bg-[#1e293b]/70 border-slate-700/50 hover:bg-[#1e293b] hover:border-slate-500 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)]'
+                        : 'bg-slate-50/80 border-slate-200 hover:border-indigo-300 hover:bg-white hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]'
                     }
                   `}
                   style={{
-                    boxShadow: isActive ? `0 8px 24px -4px ${accent}40, 0 0 0 1.5px ${accent}` : undefined,
+                    boxShadow: isActive ? `0 8px 24px -4px ${accent}50, 0 0 0 2px ${accent}` : undefined,
                   } as React.CSSProperties}
                 >
                   {/* Micro Gradient Background for Active State */}

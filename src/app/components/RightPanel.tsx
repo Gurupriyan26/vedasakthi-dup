@@ -359,16 +359,18 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       key={m.key}
                       id={`metric-btn-${m.key}`}
                       onClick={() => setMetric(m.key as any)}
-                      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left transition-all duration-200 cursor-pointer group"
+                      className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 ${
+                        !isActive ? (dk ? 'hover:border-slate-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)]' : 'hover:border-indigo-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.18)]') : ''
+                      }`}
                       style={isActive ? {
                         background: dk
-                          ? `linear-gradient(135deg, ${ac.hex}20, ${ac.hex}10)`
-                          : `linear-gradient(135deg, ${ac.hex}12, ${ac.hex}06)`,
-                        border: `1.5px solid ${ac.hex}40`,
-                        boxShadow: `0 4px 20px ${ac.hex}20`,
+                          ? `linear-gradient(135deg, ${ac.hex}25, ${ac.hex}12)`
+                          : `linear-gradient(135deg, ${ac.hex}15, ${ac.hex}08)`,
+                        border: `1.5px solid ${ac.hex}`,
+                        boxShadow: `0 4px 24px ${ac.hex}35, 0 0 15px ${ac.hex}25`,
                       } : {
                         background: dk ? 'rgba(30,41,59,0.5)' : '#f8fafc',
-                        border: dk ? '1px solid rgba(255,255,255,0.05)' : '1px solid #e2e8f0',
+                        border: dk ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0',
                         boxShadow: dk ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
                       }}
                     >
