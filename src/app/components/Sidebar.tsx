@@ -208,18 +208,33 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                     ${isActive 
                       ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
                       : theme === 'dark'
-                        ? 'bg-[#1e293b]/70 border-slate-700/50 hover:bg-[#1e293b] hover:border-slate-500 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)]'
-                        : 'bg-slate-50/80 border-slate-200 hover:border-indigo-300 hover:bg-white hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]'
+                        ? 'bg-[#1e293b]/70 border-slate-700/50 hover:bg-[#1e293b] hover:-translate-y-1'
+                        : 'bg-slate-50/80 border-slate-200 hover:bg-white hover:-translate-y-1'
                     }
                   `}
-                  style={{
-                    boxShadow: isActive ? `0 8px 24px -4px ${accent}50, 0 0 0 2px ${accent}` : undefined,
-                  } as React.CSSProperties}
+                  style={isActive ? {
+                    boxShadow: `0 8px 24px -4px ${accent}50, 0 0 0 2px ${accent}`,
+                  } : {
+                    ['--accent-glow' as any]: accent,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.boxShadow = `0 10px 25px -5px ${accent}40, 0 0 15px ${accent}30`;
+                      e.currentTarget.style.borderColor = `${accent}80`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(51, 65, 85, 0.5)' : '#e2e8f0';
+                    }
+                  }}
                 >
-                  {/* Micro Gradient Background for Active State */}
-                  {isActive && (
-                    <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${accent}30, transparent 70%)` }} />
-                  )}
+                  {/* Subtle Hover Gradient Flare */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                    style={{ background: `radial-gradient(circle at top right, ${accent}25, transparent 70%)` }} 
+                  />
 
                   <div className="flex flex-col h-full relative z-10 w-full">
                     <div className="flex items-center justify-between w-full mb-2">

@@ -359,9 +359,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       key={m.key}
                       id={`metric-btn-${m.key}`}
                       onClick={() => setMetric(m.key as any)}
-                      className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 ${
-                        !isActive ? (dk ? 'hover:border-slate-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)]' : 'hover:border-indigo-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.18)]') : ''
-                      }`}
+                      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative overflow-hidden"
                       style={isActive ? {
                         background: dk
                           ? `linear-gradient(135deg, ${ac.hex}25, ${ac.hex}12)`
@@ -373,7 +371,24 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                         border: dk ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0',
                         boxShadow: dk ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
                       }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.boxShadow = `0 8px 25px -4px ${ac.hex}35, 0 0 12px ${ac.hex}25`;
+                          e.currentTarget.style.borderColor = `${ac.hex}70`;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.boxShadow = dk ? 'none' : '0 1px 3px rgba(0,0,0,0.02)';
+                          e.currentTarget.style.borderColor = dk ? 'rgba(255,255,255,0.06)' : '#e2e8f0';
+                        }
+                      }}
                     >
+                      {/* Subtle hover gradient flare */}
+                      <div 
+                        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: `radial-gradient(circle at right, ${ac.hex}20, transparent 70%)` }}
+                      />
                       {/* Icon */}
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200"
