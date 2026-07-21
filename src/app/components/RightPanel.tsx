@@ -482,7 +482,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                   }`}
                 >
                   <BookMarked size={10} />
-                  TNTET
+                  TNTET (Sample)
                 </button>
               </div>
             </div>
