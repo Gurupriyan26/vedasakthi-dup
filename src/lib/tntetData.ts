@@ -50,6 +50,7 @@ export const TNTET_SAMPLE_MAP: Record<string, { registered: number; qualified: n
   "THIRUVARUR": { registered: 26829, qualified: 2257 },
   "VELLORE": { registered: 27845, qualified: 3852 },
   "VILLUPURAM": { registered: 22816, qualified: 3058 },
+  "VILUPPURAM": { registered: 22816, qualified: 3058 },
   "VIRUDHUNAGAR": { registered: 8234, qualified: 702 }
 };
 
