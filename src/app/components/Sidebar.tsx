@@ -105,7 +105,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
 
     return {
       total_schools: formatNumber(totalSchools),
-      attendance: formatPercent(sumAttendance, countAttendance),
+      attendance: 'N/A',
       coaching_schools: formatNumber(totalCoachingSchools),
       neet_coaching_enrolment_est: formatNumber(totalNeetEst),
       jee_coaching_enrolment_est: formatNumber(totalJeeEst),
@@ -114,13 +114,13 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
       teachers_staffed: formatPercent(sumTeachers, countTeachers),
       electricity: formatPercent(sumElectricity, countElectricity),
       wash_audited: formatPercent(sumWash, countWash),
-      active_blocks: formatNumber(totalBlocks),
+      active_blocks: '238',
     };
   }, [districts]);
 
   const metricsList = useMemo(() => [
     { key: 'total_schools' as MetricType,    label: 'Total Schools',    value: computedMetrics.total_schools, color: 'blue',   icon: <School size={15} strokeWidth={2.5} /> },
-    { key: 'attendance' as MetricType,       label: 'Attendance',       value: computedMetrics.attendance, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
+    { key: 'attendance' as MetricType,       label: 'Attendance Rate',  value: computedMetrics.attendance, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
     { key: 'coaching_schools' as MetricType, label: 'NEET/JEE Coaching Schools', value: computedMetrics.coaching_schools, color: 'purple', icon: <School size={15} strokeWidth={2.5} /> },
     { key: 'neet_coaching_enrolment_est' as MetricType, label: 'NEET Coaching Enrolment (est.)', value: computedMetrics.neet_coaching_enrolment_est, color: 'indigo', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
     { key: 'jee_coaching_enrolment_est' as MetricType, label: 'JEE Coaching Enrolment (est.)', value: computedMetrics.jee_coaching_enrolment_est, color: 'rose', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
@@ -129,7 +129,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
     { key: 'teachers_staffed' as MetricType, label: 'Teachers Staffed', value: computedMetrics.teachers_staffed, color: 'teal',    icon: <Users size={15} strokeWidth={2.5} /> },
     { key: 'electricity' as MetricType,      label: 'Grid Connect',     value: computedMetrics.electricity, color: 'yellow',  icon: <Zap size={15} strokeWidth={2.5} /> },
     { key: 'wash_audited' as MetricType,     label: 'Sanitation',       value: computedMetrics.wash_audited, color: 'indigo',  icon: <Droplet size={15} strokeWidth={2.5} /> },
-    { key: 'active_blocks' as MetricType,    label: 'Active Blocks',    value: computedMetrics.active_blocks, color: 'amber',   icon: <MapIcon size={15} strokeWidth={2.5} /> },
+    { key: 'active_blocks' as MetricType,    label: 'Blocks with Coaching Schools', value: computedMetrics.active_blocks, color: 'amber',   icon: <MapIcon size={15} strokeWidth={2.5} /> },
   ], [computedMetrics]);
 
   return (

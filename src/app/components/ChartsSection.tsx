@@ -30,7 +30,7 @@ const METRIC_LABELS: Record<MetricType, string> = {
   teachers_staffed: 'Teachers Staffed',
   electricity: 'Grid Connect',
   wash_audited: 'Sanitation',
-  active_blocks: 'Active Blocks',
+  active_blocks: 'Blocks with Coaching Schools',
 };
 
 function getMetricColor(metric: MetricType, value?: number): string {

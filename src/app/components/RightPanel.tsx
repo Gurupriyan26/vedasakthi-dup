@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { District } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
 import { fetchVetriSchools, VetriSchool } from '@/lib/api';
+import { getTntetDataForDistrict } from '@/lib/tntetData';
 import {
   School, UserCheck, GraduationCap, FlaskConical, Users, Zap,
   Droplet, Layers, Activity, X, MapPin, TrendingUp, BookOpen,
@@ -213,7 +214,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
       color: 'blue',
       metrics: [
         { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), icon: <School size={14} strokeWidth={2.5} />, color: 'blue', isPercent: false },
-        { key: 'active_blocks', label: 'Active Blocks', value: String(metrics?.active_blocks || 0), icon: <Layers size={14} strokeWidth={2.5} />, color: 'amber', isPercent: false },
+        { key: 'active_blocks', label: 'Blocks with Coaching Schools', value: String(metrics?.active_blocks || 0), icon: <Layers size={14} strokeWidth={2.5} />, color: 'amber', isPercent: false },
         { key: 'electricity', label: 'Grid Connected', value: Number(metrics?.electricity) || 0, icon: <Zap size={14} strokeWidth={2.5} />, color: 'yellow', isPercent: true },
         { key: 'wash_audited', label: 'Sanitation', value: Number(metrics?.wash_audited) || 0, icon: <Droplet size={14} strokeWidth={2.5} />, color: 'teal', isPercent: true },
         { key: 'hi_tech_labs', label: 'Lab Facilities', value: Number(metrics?.hi_tech_labs) || 0, icon: <FlaskConical size={14} strokeWidth={2.5} />, color: 'rose', isPercent: true },
@@ -224,7 +225,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
       icon: <Users size={13} />,
       color: 'emerald',
       metrics: [
-        { key: 'attendance', label: 'Attendance Rate', value: Number(metrics?.attendance) || 0, icon: <UserCheck size={14} strokeWidth={2.5} />, color: 'emerald', isPercent: true },
+        { key: 'attendance', label: 'Attendance Rate', value: 'N/A', icon: <UserCheck size={14} strokeWidth={2.5} />, color: 'emerald', isPercent: false },
         { key: 'teachers_staffed', label: 'Teachers Staffed', value: Number(metrics?.teachers_staffed) || 0, icon: <Users size={14} strokeWidth={2.5} />, color: 'teal', isPercent: true },
       ],
     },
@@ -544,36 +545,96 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
             </div>
           )}
 
-          {/* ── TAB: TNTET Candidates (placeholder) ── */}
-          {activeTab === 'tntet' && (
-            <div className="px-4">
-              <div className={`relative overflow-hidden flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed text-center ${
-                dk ? 'bg-[#1e293b]/20 border-indigo-800/30' : 'bg-indigo-50/40 border-indigo-200'
-              }`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none rounded-2xl" />
-                <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
-                  dk ? 'bg-indigo-900/40 border border-indigo-800/50' : 'bg-indigo-100 border border-indigo-200'
+          {/* ── TAB: TNTET Candidates (SAMPLE DATA) ── */}
+          {activeTab === 'tntet' && (() => {
+            const tntetInfo = getTntetDataForDistrict(selectedDistrict.district_name);
+            const fmt = (n: number) => new Intl.NumberFormat('en-IN').format(n);
+            return (
+              <div className="px-4 pb-6 flex flex-col gap-3">
+                {/* Clear Sample Data Banner */}
+                <div className={`p-3.5 rounded-2xl border flex items-start gap-3 ${
+                  dk ? 'bg-amber-500/10 border-amber-500/30 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'
                 }`}>
-                  <BookMarked size={24} strokeWidth={1.5} className={dk ? 'text-indigo-400' : 'text-indigo-400'} />
+                  <div className={`p-1.5 rounded-xl flex-shrink-0 ${dk ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
+                    <BookMarked size={16} />
+                  </div>
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/20 border border-amber-500/30 text-amber-400 mb-1">
+                      Sample Data — Demonstration Only
+                    </span>
+                    <p className="text-[11px] leading-relaxed opacity-90 font-medium">
+                      Official district-level TNTET figures are pending release. The numbers below are illustrative sample data to demonstrate the view.
+                    </p>
+                  </div>
                 </div>
-                <div className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3 ${
-                  dk ? 'bg-indigo-900/50 text-indigo-400 border border-indigo-700/40' : 'bg-indigo-100 text-indigo-600 border border-indigo-200'
-                }`}>
-                  Data Pending
-                </div>
-                <p className={`text-[11px] font-black uppercase tracking-widest mb-1.5 ${dk ? 'text-slate-400' : 'text-slate-600'}`}>
-                  TNTET Candidates
-                </p>
-                <p className={`text-[10px] leading-relaxed max-w-[190px] ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
-                  TNTET candidate data for this district has not yet been provided. This view will be enabled once data is available.
-                </p>
-                <div className={`mt-4 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider ${dk ? 'text-slate-600' : 'text-slate-400'}`}>
-                  <ToggleLeft size={12} />
-                  Coming in a future update
+
+                {/* Candidate Stats Cards with (Sample) tags */}
+                <div className="grid grid-cols-1 gap-2.5 mt-1">
+                  {/* Registered Candidates Card */}
+                  <div className={`p-4 rounded-2xl border flex items-center justify-between ${
+                    dk ? 'bg-[#1e293b]/60 border-slate-700/50' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-extrabold uppercase tracking-wider ${dk ? 'text-indigo-400' : 'text-indigo-600'}`}>
+                          Registered Candidates
+                        </span>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${dk ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}>
+                          (Sample)
+                        </span>
+                      </div>
+                      <div className={`text-[22px] font-black tracking-tight ${dk ? 'text-white' : 'text-slate-900'}`}>
+                        {fmt(tntetInfo.registered)}
+                      </div>
+                      <p className={`text-[10px] mt-0.5 ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Illustrative district registration estimate
+                      </p>
+                    </div>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${dk ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-800/50' : 'bg-indigo-100 text-indigo-600'}`}>
+                      <Users size={18} />
+                    </div>
+                  </div>
+
+                  {/* TNTET Qualified Card */}
+                  <div className={`p-4 rounded-2xl border flex items-center justify-between ${
+                    dk ? 'bg-[#1e293b]/60 border-slate-700/50' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-extrabold uppercase tracking-wider ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                          TNTET Qualified
+                        </span>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${dk ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}>
+                          (Sample)
+                        </span>
+                      </div>
+                      <div className={`text-[22px] font-black tracking-tight ${dk ? 'text-white' : 'text-slate-900'}`}>
+                        {fmt(tntetInfo.qualified)}
+                      </div>
+                      <p className={`text-[10px] mt-0.5 ${dk ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Qualified candidate count (sample)
+                      </p>
+                    </div>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${dk ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-600'}`}>
+                      <GraduationCap size={18} />
+                    </div>
+                  </div>
+
+                  {/* Sample Pass Percentage Badge */}
+                  <div className={`p-3.5 rounded-2xl border flex items-center justify-between ${
+                    dk ? 'bg-indigo-950/30 border-indigo-800/30' : 'bg-indigo-50/50 border-indigo-100'
+                  }`}>
+                    <span className={`text-[11px] font-bold ${dk ? 'text-indigo-300' : 'text-indigo-900'}`}>
+                      Sample Qualification Ratio
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full text-[12px] font-black bg-indigo-500 text-white">
+                      {tntetInfo.passPercentage}%
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
         </div>
       </div>

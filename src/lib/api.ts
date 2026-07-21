@@ -121,3 +121,31 @@ export async function fetchVetriSchools(districtId: number): Promise<VetriSchool
     return [];
   }
 }
+
+// ─── TNTET Candidates Data ───────────────────────────────────────────────────
+
+export interface TntetCandidateRecord {
+  district_id: number;
+  registered_candidates: number;
+  qualified_candidates: number;
+  is_sample: boolean;
+}
+
+/**
+ * Fetch TNTET candidate metrics for a district from Supabase table `tntet_candidates`.
+ */
+export async function fetchTntetCandidates(districtId: number): Promise<TntetCandidateRecord | null> {
+  try {
+    const { data, error } = await supabase
+      .from('tntet_candidates')
+      .select('district_id, registered_candidates, qualified_candidates, is_sample')
+      .eq('district_id', districtId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data as TntetCandidateRecord | null;
+  } catch (err) {
+    console.warn(`Failed to fetch TNTET data from Supabase for district ${districtId}`, err);
+    return null;
+  }
+}
