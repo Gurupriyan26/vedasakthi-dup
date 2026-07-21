@@ -82,42 +82,35 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
   const fmt = (v: number) => isPercent ? `${v}%` : new Intl.NumberFormat('en-IN').format(v);
 
   return (
-    <div className="flex flex-col xl:flex-row p-2 sm:p-3 bg-transparent">
+    <div className="flex flex-col p-1.5 sm:p-2 bg-transparent">
       {/* ── Bar Chart ── */}
-      <div className={`flex-1 rounded-xl p-3 sm:p-4 min-h-[120px] border shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
-        theme === 'dark'
-          ? 'bg-[#0f172a]/85 border-[#1e293b]'
-          : 'bg-white/50 border-white/60'
-      }`}>
-        {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
-        
-        <div className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-4 sm:mb-5 pr-8 relative z-10 transition-colors duration-300 ${
-          theme === 'dark' ? 'text-slate-400' : 'text-slate-450'
+      <div className={`rounded-xl p-2 sm:p-3 min-h-[90px] relative overflow-hidden backdrop-blur-md transition-all duration-300`}>
+        <div className={`text-[9px] font-black uppercase tracking-widest mb-1.5 pr-8 relative z-10 transition-colors duration-300 ${
+          theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
         }`}>
           Distribution Overview — {label}
         </div>
-        <div className="relative z-10 w-full h-[120px] sm:h-[140px]">
+        <div className="relative z-10 w-full h-[90px] sm:h-[105px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 5, left: -25, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 15, right: 5, left: -25, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#e2e8f0'} />
               <XAxis
                 dataKey="name"
                 axisLine={{ stroke: theme === 'dark' ? '#1e293b' : '#cbd5e1' }}
                 tickLine={false}
                 tick={false}
-                height={10}
+                height={5}
               />
               <ReferenceLine 
                 y={averageValue} 
                 stroke={theme === 'dark' ? '#818cf8' : '#6366f1'} 
                 strokeDasharray="4 4" 
-                strokeWidth={2}
+                strokeWidth={1.5}
                 label={{ 
                   position: 'top', 
                   value: `STATE AVG: ${fmt(Math.round(averageValue))}`, 
                   fill: theme === 'dark' ? '#818cf8' : '#6366f1', 
-                  fontSize: 10, 
+                  fontSize: 9, 
                   fontWeight: 900,
                   fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif"
                 }} 
@@ -125,7 +118,7 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: theme === 'dark' ? '#94a3b8' : '#64748b', fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif", fontWeight: 600 }}
+                tick={{ fontSize: 9, fill: theme === 'dark' ? '#94a3b8' : '#64748b', fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif", fontWeight: 600 }}
               />
               <Tooltip
                 cursor={{ fill: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : '#f8fafc' }}
@@ -134,16 +127,16 @@ export default function ChartsSection({ districts }: ChartsSectionProps) {
                   borderRadius: '12px',
                   border: theme === 'dark' ? '1px solid #1e293b' : '1px solid #e2e8f0',
                   fontFamily: "'Noto Sans', 'Noto Sans Tamil', sans-serif",
-                  fontSize: '12px',
+                  fontSize: '11px',
                   color: theme === 'dark' ? '#ffffff' : '#1e293b',
-                  padding: '14px',
+                  padding: '10px 12px',
                   boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
                 }}
                 itemStyle={{ color: theme === 'dark' ? '#ffffff' : '#1e293b', fontWeight: 900 }}
-                labelStyle={{ color: theme === 'dark' ? '#94a3b8' : '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 800 }}
+                labelStyle={{ color: theme === 'dark' ? '#94a3b8' : '#64748b', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px', fontWeight: 800 }}
                 formatter={(v) => [fmt(Number(v ?? 0)), label] as [string, string]}
               />
-              <Bar dataKey="value" radius={[20, 20, 20, 20]}>
+              <Bar dataKey="value" radius={[12, 12, 12, 12]} maxBarSize={18}>
                 {chartData.map((entry, i) => (
                   <Cell key={i} fill={getMetricColor(selectedMetric, entry.value)} />
                 ))}

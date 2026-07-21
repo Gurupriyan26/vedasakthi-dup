@@ -160,23 +160,22 @@ export default function DashboardPage() {
                 </button>
               )}
 
-              {/* Charts — Floating sleek panel over the map */}
+              {/* Charts — Floating sleek compact panel over the map */}
               {showCharts && !loading && filteredDistricts.length > 0 && (
                 <div
-                  className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-[1000] rounded-[24px] shadow-2xl border border-white/60 overflow-hidden transition-all duration-300"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.75)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                  }}
+                  className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-3xl z-[1000] rounded-2xl shadow-2xl border overflow-hidden transition-all duration-300 ${
+                    theme === 'dark' 
+                      ? 'border-indigo-500/20 bg-[#0f172a]/80 backdrop-blur-xl' 
+                      : 'border-slate-200/80 bg-white/80 backdrop-blur-xl'
+                  }`}
                 >
                   {/* Close button */}
                   <button
                     onClick={() => setShowCharts(false)}
-                    className="absolute top-4 right-4 z-[1001] p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors"
+                    className="absolute top-2.5 right-3 z-[1001] p-1 rounded-full text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
                     aria-label="Hide chart"
                   >
-                    <X size={14} strokeWidth={2.5} />
+                    <X size={13} strokeWidth={2.5} />
                   </button>
                   <ChartsSection districts={filteredDistricts} />
                 </div>
