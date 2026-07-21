@@ -219,8 +219,13 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.boxShadow = `0 10px 25px -5px ${accent}40, 0 0 15px ${accent}30`;
-                      e.currentTarget.style.borderColor = `${accent}80`;
+                      if (theme === 'dark') {
+                        e.currentTarget.style.boxShadow = `0 10px 25px -5px ${accent}40, 0 0 15px ${accent}30`;
+                        e.currentTarget.style.borderColor = `${accent}80`;
+                      } else {
+                        e.currentTarget.style.boxShadow = `0 10px 25px -5px ${accent}25, 0 4px 12px ${accent}15`;
+                        e.currentTarget.style.borderColor = `${accent}`;
+                      }
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -233,7 +238,11 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                   {/* Subtle Hover Gradient Flare */}
                   <div 
                     className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
-                    style={{ background: `radial-gradient(circle at top right, ${accent}25, transparent 70%)` }} 
+                    style={{ 
+                      background: theme === 'dark'
+                        ? `radial-gradient(circle at top right, ${accent}25, transparent 70%)`
+                        : `radial-gradient(circle at top right, ${accent}12, transparent 70%)`
+                    }} 
                   />
 
                   <div className="flex flex-col h-full relative z-10 w-full">

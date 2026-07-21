@@ -373,8 +373,13 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.boxShadow = `0 8px 25px -4px ${ac.hex}35, 0 0 12px ${ac.hex}25`;
-                          e.currentTarget.style.borderColor = `${ac.hex}70`;
+                          if (dk) {
+                            e.currentTarget.style.boxShadow = `0 8px 25px -4px ${ac.hex}35, 0 0 12px ${ac.hex}25`;
+                            e.currentTarget.style.borderColor = `${ac.hex}70`;
+                          } else {
+                            e.currentTarget.style.boxShadow = `0 8px 25px -4px ${ac.hex}20, 0 4px 12px ${ac.hex}10`;
+                            e.currentTarget.style.borderColor = ac.hex;
+                          }
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -387,7 +392,11 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       {/* Subtle hover gradient flare */}
                       <div 
                         className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{ background: `radial-gradient(circle at right, ${ac.hex}20, transparent 70%)` }}
+                        style={{ 
+                          background: dk
+                            ? `radial-gradient(circle at right, ${ac.hex}20, transparent 70%)`
+                            : `radial-gradient(circle at right, ${ac.hex}08, transparent 70%)`
+                        }}
                       />
                       {/* Icon */}
                       <div
