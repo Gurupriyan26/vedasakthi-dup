@@ -255,7 +255,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                     <div className="flex items-center justify-between w-full mb-2">
                       <div 
                         className={`p-1.5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${
-                          !isActive && theme === 'light' ? 'border border-slate-250 bg-white' : ''
+                          !isActive && theme === 'light' ? 'border border-slate-200 bg-white' : ''
                         }`} 
                         style={{ 
                           backgroundColor: isActive ? accent : (theme === 'dark' ? '#0f172a' : '#ffffff'), 
@@ -277,10 +277,10 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                     
                     <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 transition-colors duration-300 flex items-center gap-1 flex-wrap ${
                       isActive 
-                        ? theme === 'dark' ? 'text-slate-350' : 'text-slate-700'
+                        ? theme === 'dark' ? 'text-slate-200' : 'text-slate-700'
                         : theme === 'dark'
                           ? 'text-slate-400'
-                          : 'text-slate-650'
+                          : 'text-slate-600'
                     }`}>
                       {m.label}
                       {m.isUnverified && (

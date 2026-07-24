@@ -81,7 +81,7 @@ export default function Header({
             }}
             className={`px-3 py-2 text-xs font-bold uppercase transition-all rounded-xl border ${
               theme === 'dark' 
-                ? 'bg-slate-800 border-slate-700 text-slate-350 hover:bg-slate-750' 
+                ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' 
                 : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
             }`}
           >
