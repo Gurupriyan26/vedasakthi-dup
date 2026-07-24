@@ -206,14 +206,20 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                   className={`
                     relative flex flex-col justify-between rounded-xl p-3 text-left transition-all duration-300 overflow-hidden group border
                     ${isActive 
-                      ? 'transform -translate-y-1 bg-[#1e293b] border-transparent' 
+                      ? theme === 'dark'
+                        ? 'transform -translate-y-1 bg-[#1e293b]' 
+                        : 'transform -translate-y-1 bg-white'
                       : theme === 'dark'
                         ? 'bg-[#1e293b]/70 border-slate-700/50 hover:bg-[#1e293b] hover:-translate-y-1'
                         : 'bg-slate-50/80 border-slate-200 hover:bg-white hover:-translate-y-1'
                     }
                   `}
                   style={isActive ? {
-                    boxShadow: `0 8px 24px -4px ${accent}50, 0 0 0 2px ${accent}`,
+                    borderColor: accent,
+                    borderWidth: '2px',
+                    boxShadow: theme === 'dark'
+                      ? `0 8px 24px -4px ${accent}50, 0 0 15px ${accent}30`
+                      : `0 8px 24px -4px ${accent}30, 0 4px 12px ${accent}15`,
                   } : {
                     ['--accent-glow' as any]: accent,
                   }}
@@ -260,7 +266,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                       </div>
                       <span className={`text-[18px] font-black tracking-tight leading-none transition-colors duration-300 ${
                         isActive 
-                          ? 'text-white' 
+                          ? theme === 'dark' ? 'text-white' : 'text-slate-900'
                           : theme === 'dark'
                             ? 'text-slate-200'
                             : 'text-slate-900'
@@ -271,19 +277,17 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                     
                     <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 transition-colors duration-300 flex items-center gap-1 flex-wrap ${
                       isActive 
-                        ? 'text-slate-200' 
+                        ? theme === 'dark' ? 'text-slate-350' : 'text-slate-700'
                         : theme === 'dark'
                           ? 'text-slate-400'
-                          : 'text-slate-600'
+                          : 'text-slate-650'
                     }`}>
                       {m.label}
                       {m.isUnverified && (
                         <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
-                          isActive
-                            ? 'bg-white/20 text-white'
-                            : theme === 'dark'
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                              : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
+                          theme === 'dark'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
                         }`}>
                           Unverified
                         </span>

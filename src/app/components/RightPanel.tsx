@@ -419,13 +419,9 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                           {m.label}
                           {(m as any).isUnverified && (
                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
-                              isActive
-                                ? dk 
-                                  ? 'bg-white/20 text-white' 
-                                  : 'bg-black/10 text-slate-800'
-                                : dk
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                  : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
+                              dk
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
                             }`}>
                               Unverified
                             </span>
