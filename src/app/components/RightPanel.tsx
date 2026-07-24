@@ -213,7 +213,7 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
       icon: <Building2 size={13} />,
       color: 'blue',
       metrics: [
-        { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), icon: <School size={14} strokeWidth={2.5} />, color: 'blue', isPercent: false },
+        { key: 'total_schools', label: 'Total Schools', value: new Intl.NumberFormat('en-IN').format(Number(metrics?.total_schools) || 0), icon: <School size={14} strokeWidth={2.5} />, color: 'blue', isPercent: false, isUnverified: true },
         { key: 'active_blocks', label: 'Blocks with Coaching Schools', value: String(metrics?.active_blocks || 0), icon: <Layers size={14} strokeWidth={2.5} />, color: 'amber', isPercent: false },
         { key: 'electricity', label: 'Grid Connected', value: Number(metrics?.electricity) || 0, icon: <Zap size={14} strokeWidth={2.5} />, color: 'yellow', isPercent: true },
         { key: 'wash_audited', label: 'Sanitation', value: Number(metrics?.wash_audited) || 0, icon: <Droplet size={14} strokeWidth={2.5} />, color: 'teal', isPercent: true },
@@ -413,10 +413,23 @@ export default function RightPanel({ selectedDistrict, onClearDistrict }: RightP
                       {/* Label + value */}
                       <div className="flex-1 min-w-0">
                         <div
-                          className="text-[10px] font-bold uppercase tracking-wider"
+                          className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 flex-wrap"
                           style={{ color: isActive ? ac.hex : (dk ? 'rgba(148,163,184,0.8)' : 'rgba(100,116,139,0.9)') }}
                         >
                           {m.label}
+                          {(m as any).isUnverified && (
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                              isActive
+                                ? dk 
+                                  ? 'bg-white/20 text-white' 
+                                  : 'bg-black/10 text-slate-800'
+                                : dk
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
+                            }`}>
+                              Unverified
+                            </span>
+                          )}
                         </div>
                         <div
                           className="text-[18px] font-black tracking-tight leading-tight mt-0.5"

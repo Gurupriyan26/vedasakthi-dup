@@ -119,7 +119,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
   }, [districts]);
 
   const metricsList = useMemo(() => [
-    { key: 'total_schools' as MetricType,    label: 'Total Schools',    value: computedMetrics.total_schools, color: 'blue',   icon: <School size={15} strokeWidth={2.5} /> },
+    { key: 'total_schools' as MetricType,    label: 'Total Schools',    value: computedMetrics.total_schools, color: 'blue',   icon: <School size={15} strokeWidth={2.5} />, isUnverified: true },
     { key: 'attendance' as MetricType,       label: 'Attendance Rate',  value: computedMetrics.attendance, color: 'emerald', icon: <UserCheck size={15} strokeWidth={2.5} /> },
     { key: 'coaching_schools' as MetricType, label: 'NEET/JEE Coaching Schools', value: computedMetrics.coaching_schools, color: 'purple', icon: <School size={15} strokeWidth={2.5} /> },
     { key: 'neet_coaching_enrolment_est' as MetricType, label: 'NEET Coaching Enrolment (est.)', value: computedMetrics.neet_coaching_enrolment_est, color: 'indigo', icon: <GraduationCap size={15} strokeWidth={2.5} /> },
@@ -269,7 +269,7 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                       </span>
                     </div>
                     
-                    <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 line-clamp-2 transition-colors duration-300 ${
+                    <span className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1 transition-colors duration-300 flex items-center gap-1 flex-wrap ${
                       isActive 
                         ? 'text-slate-200' 
                         : theme === 'dark'
@@ -277,6 +277,17 @@ export default function Sidebar({ districts, loading, isOpen = false, onClose }:
                           : 'text-slate-600'
                     }`}>
                       {m.label}
+                      {m.isUnverified && (
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : theme === 'dark'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'bg-amber-100 text-amber-800 border border-amber-250 shadow-sm'
+                        }`}>
+                          Unverified
+                        </span>
+                      )}
                     </span>
                   </div>
                 </button>
